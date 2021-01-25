@@ -1,0 +1,43 @@
+<mat-form-field>
+    <input matInput [(ngModel)]="page" type="number" (change)="Filter()">
+</mat-form-field>
+<mat-form-field>
+    <input matInput [(ngModel)]="row" type="number" (change)="Filter()">
+</mat-form-field>
+    <mat-checkbox [(ngModel)]="catalogForSale" (change)="Filter()">購入可のみ</mat-checkbox>
+
+{{(page - 1) * row + 1}} - {{(page - 1) * row + showingData.length}} / {{filteredData.length}} / {{raw.length}}
+<div>
+    <button mat-raised-button *ngFor="let c of categories1" (click)="CategoryButton(c)"
+        [class.active]="c.checked">{{c.name}}</button>
+</div>
+<div>
+    <button mat-raised-button *ngFor="let c of categories2" (click)="CategoryButton(c)"
+        [class.active]="c.checked">{{c.name}}</button>
+</div>
+<div>
+    <button mat-raised-button *ngFor="let c of categories3" (click)="CategoryButton(c)"
+        [class.active]="c.checked">{{c.name}}</button>
+</div>
+
+
+<table matSort (matSortChange)="ReSort($event)" matSortActive="name" matSortDirection="asc">
+    <tr>
+        <!--  -->
+        <th mat-sort-header="name" disableClear>なまえ</th>
+        <th *ngIf="settings.show.image">がぞう</th>
+        <th mat-sort-header="source" disableClear>入手手段</th>
+        <th mat-sort-header="catalog" disableClear>カタログ</th>
+    </tr>
+    <tr *ngFor="let r of showingData">
+        <!-- <td>{{r|json}}</td> -->
+        <td>{{r.translations?.japanese}}</td>
+        <td *ngIf="settings.show.image"><img [src]="r.image"></td>
+        <td>
+            <span *ngFor="let s of r.source;let i = index">{{t.ItemsSource(s)}}<ng-container *ngIf="r.source.length > i+1"> , </ng-container></span>
+            <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="r.sourceNotes"><mat-icon>speaker_notes</mat-icon></button>
+            <mat-menu #menu="matMenu">{{r.sourceNotes}}</mat-menu>
+        </td>
+        <td>{{t.Catalog(r.catalog)}}</td>
+    </tr>
+</table>
