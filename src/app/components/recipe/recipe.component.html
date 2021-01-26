@@ -1,7 +1,7 @@
 <mat-toolbar>
     <mat-checkbox [(ngModel)]="settings.showimage" (ngModelChange)="settings.settingChanged.next({prop:'showimage',data:settings.showimage})">image</mat-checkbox>
     <mat-checkbox [(ngModel)]="settings.showdata" (ngModelChange)="settings.settingChanged.next({prop:'showdata',data:settings.showdata})">data</mat-checkbox>
-    <mat-checkbox [(ngModel)]="settings.showVariations" (ngModelChange)="settings.settingChanged.next({prop:'showVariations',data:settings.showVariations})">variations</mat-checkbox>
+    <!-- <mat-checkbox [(ngModel)]="settings.showVariations" (ngModelChange)="settings.settingChanged.next({prop:'showVariations',data:settings.showVariations})">variations</mat-checkbox> -->
 </mat-toolbar>
 <mat-form-field>
     <input matInput [(ngModel)]="page" type="number" (change)="Filter()">
@@ -9,8 +9,7 @@
 <mat-form-field>
     <input matInput [(ngModel)]="row" type="number" (change)="Filter()">
 </mat-form-field>
-<mat-checkbox [(ngModel)]="catalogForSale" (change)="Filter()">購入可のみ</mat-checkbox>
-<button mat-button (click)="ToggleState(diystate, diy)">{{diy.state}}</button>
+<button mat-button (click)="ToggleState(eventstate, event)">{{event.state}}</button>
 
 {{(page - 1) * row + 1}} - {{(page - 1) * row + showingData.length}} / {{filteredData.length}} / {{raw.length}}
 
@@ -24,49 +23,14 @@
 </div>
 
 <div>
-    <button mat-icon-button (click)="CategoryAll(categories1)">
+    <button mat-icon-button (click)="CategoryAll(categories)">
         <mat-icon>weekend</mat-icon>
     </button>
-    <button mat-raised-button *ngFor="let c of categories1" (click)="CategoryButton(c)"
-        [class.active]="c.checked">{{c.name}}</button>
-</div>
-<div>
-    <button mat-icon-button (click)="CategoryAll(categories2)">
-        <mat-icon>checkroom</mat-icon>
-    </button>
-    <button mat-raised-button *ngFor="let c of categories2" (click)="CategoryButton(c)"
-        [class.active]="c.checked">{{c.name}}</button>
-</div>
-<div>
-    <button mat-icon-button (click)="CategoryAll(categories3)">
-        <mat-icon>music_note</mat-icon>
-    </button>
-    <button mat-raised-button *ngFor="let c of categories3" (click)="CategoryButton(c)"
+    <button mat-raised-button *ngFor="let c of categories" (click)="CategoryButton(c)"
         [class.active]="c.checked">{{c.name}}</button>
 </div>
 
 
-<!-- <table matSort (matSortChange)="ReSort($event)" matSortActive="name" matSortDirection="asc">
-    <tr>
-        <th mat-sort-header="name" disableClear>なまえ</th>
-        <th *ngIf="settings.show.image">がぞう</th>
-        <th mat-sort-header="source" disableClear>入手手段</th>
-        <th mat-sort-header="catalog" disableClear>カタログ</th>
-    </tr>
-    <tr *ngFor="let r of showingData">
-        <td>{{r.translations?.japanese}}</td>
-        <td *ngIf="settings.show.image"><img [src]="r.image"></td>
-        <td>
-            <span *ngFor="let s of r.source;let i = index">{{t.ItemsSource(s)}}<ng-container
-                    *ngIf="IsNotLast(i, r.source)"> , </ng-container></span>
-            <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="r.sourceNotes">
-                <mat-icon>speaker_notes</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">{{r.sourceNotes}}</mat-menu>
-        </td>
-        <td>{{t.Catalog(r.catalog)}}</td>
-    </tr>
-</table> -->
 
 <table mat-table [dataSource]="showingData" matSort (matSortChange)="ReSort($event)" matSortActive="name"
     matSortDirection="asc">
@@ -108,7 +72,7 @@
             </div>
         </td>
     </ng-container>
-    <ng-container [matColumnDef]="colData.variations.id">
+    <!-- <ng-container [matColumnDef]="colData.variations.id">
         <th class="h_variations" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>バリエーション</th>
         <td class="d_variations" mat-cell *matCellDef="let element">
             <div>
@@ -117,7 +81,7 @@
                 </div>
             </div>
         </td>
-    </ng-container>
+    </ng-container> -->
     <tr mat-header-row *matHeaderRowDef="col"></tr>
     <tr mat-row *matRowDef="let row; columns: col;"></tr>
 </table>

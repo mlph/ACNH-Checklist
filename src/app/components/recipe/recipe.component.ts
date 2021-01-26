@@ -1,136 +1,95 @@
 import { Component, OnInit } from '@angular/core';
 import { Sort } from '@angular/material/sort';
-import { Catalog, Category, Item, VariationElement } from 'animal-crossing/lib/types/Item';
-import { DataService, ItemJ } from 'src/app/services/data.service';
+import { Category } from 'animal-crossing/lib/types/Recipe';
+import { DataService, IRecipeJ } from 'src/app/services/data.service';
+import { NihongoService } from 'src/app/services/nihongo.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { TranslationService } from 'src/app/services/translation.service';
 
-import { NihongoService } from 'src/app/services/nihongo.service';
 @Component({
-  selector: 'app-table',
-  templateUrl: './table.component.html',
-  styleUrls: ['./table.component.scss']
+  selector: 'app-recipe',
+  templateUrl: './recipe.component.html',
+  styleUrls: ['./recipe.component.scss']
 })
-export class TableComponent implements OnInit {
+export class RecipeComponent implements OnInit {
 
+  raw = this.data.recipe;
 
-  raw = this.data.data;
-
-  filteredData: ItemJ[] = [];
-  showingData: ItemJ[] = [];
+  filteredData: IRecipeJ[] = [];
+  showingData: IRecipeJ[] = [];
 
   page = 1;
   row = 100;
 
-  catalogForSale = false;
-  diystate = ["全て", "DIYのみ", "DIY以外"];
-  diy = { state: this.diystate[0] };
+  eventstate = ["全て", "季節/イベント限定のみ", "季節/イベント限定を除く"];
+  event = { state: this.eventstate[0] };
+
 
   search = "";
   private _search = "";
-  col = ["name", "source", "catalog"];
+  col = ["name", "image", "source"];
 
   colDataSimple = [
     {
       id: "name",
       header: "なまえ",
-      data: (i: ItemJ) => i.nameJ
+      data: (i: IRecipeJ) => i.nameJ
     },
-    {
-      id: "catalog",
-      header: "カタログ",
-      data: (i: ItemJ) => this.t.Catalog(i.catalog)
-    },
+    // {
+    //   id: "catalog",
+    //   header: "カタログ",
+    //   data: (i: ItemJ) => this.t.Catalog(i.catalog)
+    // },
     {
       id: "raw",
       header: "データ",
-      data: (i: ItemJ) => JSON.stringify(i, undefined, 2)
+      data: (i: any) => JSON.stringify(i, undefined, 2)
     },
     {
-      id: "var",
-      header: "",
-      data: (i: ItemJ) => i.variations?.length || ""
+      id: "event",
+      header: "イベント",
+      data: (i: IRecipeJ) => this.t.SeasonsAndEvents(i.seasonEvent)
     }
   ];
 
   colData = {
     image: {
       id: "image",
-      data: (i: ItemJ): { src: string, name?: string; }[] => {
+      data: (i: IRecipeJ): { src: string, name?: string; }[] => {
         const result: { src: string, name?: string; }[] = [];
-        [i.image, i.closetImage, i.albumImage, i.framedImage, i.storageImage, i.inventoryImage].forEach(v => {
+        [i.image].forEach(v => {
           if (v) {
             result.push({ src: v });
           }
         });
-        // const im = i.image || i.storageImage || i.inventoryImage || i.closetImage;
-        // if (im) {
-        //   return [{ src: im }];
-        // }
-        // if (i.albumImage && i.framedImage) {
-        //   return [
-        //     { src: i.albumImage },
-        //     { src: i.framedImage }
-        //   ];
-        // }
-        if (i.variations) {
-          result.push(...i.variations.map(v => ({
-            src: v.image || v.closetImage || v.storageImage || "",
-            name: v.variantTranslations?.japanese || v.patternTranslations?.japanese || ""
-          })));
-        }
         return result;
       },
     },
     source: {
       id: "source"
     },
-    variations: {
-      id: "variations",
-      ja: (v: VariationElement) => v.variantTranslations?.japanese || v.patternTranslations?.japanese
-    },
-    var: {
-      id: "var",
-      exist: (i: ItemJ) => !!i.variations
-    }
+    // variations: {
+    //   id: "variations",
+    //   ja: (v: VariationElement) => v.variantTranslations?.japanese || v.patternTranslations?.japanese
+    // },
+    // var: {
+    //   id: "var",
+    //   exist: (i: ItemJ) => !!i.variations
+    // }
   };
 
-  categories1 = [
+  categories = [
     Category.Housewares,
     Category.Miscellaneous,
     Category.WallMounted,
     Category.Wallpaper,
     Category.Rugs,
     Category.Floors,
-    Category.Art,
-    Category.Fencing,
-    Category.Fossils,
-    Category.Photos,
-    Category.Posters,
-  ].map(v => ({ key: v, name: this.t.Category(v), checked: false }));
-
-  categories2 = [
-    Category.Tops,
-    Category.Bottoms,
-    Category.DressUp,
-    Category.Headwear,
-    Category.Accessories,
-    Category.Socks,
-    Category.Shoes,
-    Category.Bags,
-    Category.Umbrellas,
-    Category.ClothingOther,
-  ].map(v => ({ key: v, name: this.t.Category(v), checked: false }));
-
-  categories3 = [
     Category.Equipment,
-    Category.MessageCards,
-    Category.Music,
     Category.Other,
     Category.Tools,
   ].map(v => ({ key: v, name: this.t.Category(v), checked: false }));
 
-  categories = this.categories1.concat(this.categories2).concat(this.categories3);
 
   constructor(
     private data: DataService,
@@ -148,16 +107,16 @@ export class TableComponent implements OnInit {
   }
 
   TableColumns() {
-    this.col = ["name", this.colData.var.id, this.colData.image.id, "source", "catalog", this.colData.variations.id, "raw"];
+    this.col = ["name", this.colData.image.id, "source", "raw", "event"];
     if (!this.settings.showimage) {
       this.col = this.col.filter(v => v !== this.colData.image.id);
     }
     if (!this.settings.showdata) {
       this.col = this.col.filter(v => v !== "raw");
     }
-    if (!this.settings.showVariations) {
-      this.col = this.col.filter(v => v !== this.colData.variations.id);
-    }
+    // if (!this.settings.showVariations) {
+    //   this.col = this.col.filter(v => v !== this.colData.variations.id);
+    // }
   }
 
 
@@ -188,13 +147,12 @@ export class TableComponent implements OnInit {
     // console.log(this._search);
 
     this.filteredData = this.raw
-      .filter(d => this.categories.find(c => c.key === d.sourceSheet)?.checked)
+      .filter(d => this.categories.find(c => c.key === d.category)?.checked)
       .filter(this.SearchWord)
-      .filter(d => this.catalogForSale ? d.catalog === Catalog.ForSale : true)
       .filter(d => {
-        switch (this.diy.state) {
-          case (this.diystate[1]): return d.diy === true;
-          case (this.diystate[2]): return d.diy === false;
+        switch (this.event.state) {
+          case (this.eventstate[1]): return d.seasonEventExclusive;
+          case (this.eventstate[2]): return !d.seasonEventExclusive;
           default: return true;
         }
       })
@@ -203,7 +161,7 @@ export class TableComponent implements OnInit {
         switch (this.lastSort.active) {
           case 'name': return compare(a.nameJ, b.nameJ, isAsc);
           case 'source': return compare_ItemSource(a.source, b.source, isAsc);
-          case 'catalog': return compare(a.catalog, b.catalog, isAsc);
+          case 'event': return compare(this.t.SeasonsAndEvents(a.seasonEvent), this.t.SeasonsAndEvents(b.seasonEvent), isAsc);
           default: return 0;
         }
       });
@@ -239,7 +197,7 @@ export class TableComponent implements OnInit {
     this.Filter();
   }
 
-  SearchWord = (d: ItemJ) => {
+  SearchWord = (d: IRecipeJ) => {
     if (!this.search) {
       return true;
     }
@@ -263,14 +221,3 @@ export class TableComponent implements OnInit {
     this.Filter();
   }
 }
-
-
-
-
-const firstOrUndefined = <T>(a: Array<T> | null | undefined) => {
-  if (a) {
-    return a[0];
-  }
-  return undefined;
-};
-

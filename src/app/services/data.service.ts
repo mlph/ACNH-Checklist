@@ -1,41 +1,81 @@
 import { Injectable } from '@angular/core';
-import { items } from "animal-crossing";
+import { items, npcs, recipes, translations, construction, IRecipe, villagers, seasonsAndEvents } from "animal-crossing";
 import { Category, Item } from 'animal-crossing/lib/types/Item';
 import { TranslationService } from './translation.service';
 
-// const hepburn = require("hepburn");
-// const jconv = require("jaconv");
-// import jaconv from "jaconv";
-const moji = require("moji");
+import { NihongoService } from './nihongo.service';
+import { SourceSheet } from 'animal-crossing/lib/types/Translation';
+import { Personality } from 'animal-crossing/lib/types/Villager';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
 
-  data = items.map(this.Process);
+
+
+
+  data!: ItemJ[];
   categories: { key: Category, name: string; }[] = [];
-
-  wall =
-    items
-      .filter(i => i.sourceSheet === Category.Wallpaper)
-      .map(i => this.Process(i));
+  recipe!: IRecipeJ[];
 
 
-  constructor(private t: TranslationService) {
+  constructor(
+    private t: TranslationService,
+    private nihongo: NihongoService
+  ) {
+    this.Init();
+    // this.Categories();
     this.test();
-    this.Categories();
   }
 
+  Init() {
+    const Process = (i: Item) => {
+      const r = i as ItemJ;
+      r.nameJ = i.translations?.japanese || i.name;
+      if (!i.translations || !i.translations.japanese) {
+        // if (i.sourceSheet !== Category.MessageCards) {
+        //   console.log(r.name);
+        // }
+        // const t = translations.find(t=>t.english === r.name);
+        // if(t){
+        //   r.nameJ = t.japanese
+        //   console.log(t);
+        // }
+        const t: Record<string, string> = {
+          "turnips": "カブ",
+          "spoiled turnips": "くさったカブ",
+          "coin": "おカネ",
+          "Bell bag": "ベルぶくろ"
+        };
+        r.nameJ = t[r.name] || r.name;
+      }
+      r.nameH = this.nihongo.toHiragana(r.nameJ);
+      return r;
+    };
+    const Process2 = (i: IRecipe) => {
+      const r = i as IRecipeJ;
+      r.nameJ = i.translations?.japanese || i.name;
+      r.nameH = this.nihongo.toHiragana(r.nameJ);
+      return r;
+    };
+
+    this.data = items.map(v => Process(v));
+
+    this.recipe = recipes.map(Process2);
+  }
 
   test() {
+    // console.log(construction.length);
+    // console.log(npcs.length);
+    // console.log(translations.filter(t=>t.sourceSheet === SourceSheet.));
     // console.log(items.length);
     // const wall = items.filter(i => i.sourceSheet === Category.Wallpaper);
     // console.log(wall.length);
     // const a = items.filter(v=>!v.source)
     // console.log(a)
     // const a: string[] = [];
-    // for (const i of items) {
+    // for (const i of recipes) {
     //   if (!i.source) {
     //     continue;
     //   }
@@ -45,47 +85,16 @@ export class DataService {
     //     }
     //   }
     // }
-    // console.log(a.filter(v=>this.t.ItemsSource(v).startsWith("no")));
+    // console.log(a.filter(v => this.t.ItemsSource(v).startsWith("no")));
     // console.log(a);
+    // const a = ["Furniture", "Accessories", "Tops Variants", "Furniture Patterns", "Furniture Variants", "Dresses Variants", "Dinosaurs", "Bottoms Variants", "Caps Variants", "Shoes Variants", "Constellations", "Craft", "Caps", "Socks", "Bugs", "Accessories Variants", "Bags Variants", "Socks Variants", "Tops", "Villagers", "Pictures", "Posters", "K.K. Albums", "Reactions", "Masks Variants", "ETC", "Rugs", "Marine Suit Variants", "Special NPCs", "Dresses", "Events", "HHA Themes", "Bags", "Fence", "Floors", "Walls", "Tools", "Doorplates", "Shoes", "Umbrella", "Masks", "Sea Creatures", "Villagers Catch Phrase", "Bottoms", "Bugs Models", "Fish", "Fish Models", "Marine Suit", "Event Items", "Fossils", "Art", "HHA Set", "Plants", "House Roof", "House Door", "HHA Situation", "House Wall", "House Mailbox", "Bridge & Inclines", "Fashion Themes", "Shells"]
+
+    // a.forEach(s=>console.log(translations.find(t=>t.sourceSheet === s)))
+
+    // console.log(seasonsAndEvents);
   }
 
-  Categories() {
-    this.categories = [
-      Category.Accessories,
-      Category.Art,
-      Category.Bags,
-      Category.Bottoms,
-      Category.ClothingOther,
-      Category.DressUp,
-      Category.Equipment,
-      Category.Fencing,
-      Category.Floors,
-      Category.Fossils,
-      Category.Headwear,
-      Category.Housewares,
-      Category.MessageCards,
-      Category.Miscellaneous,
-      Category.Music,
-      Category.Other,
-      Category.Photos,
-      Category.Posters,
-      Category.Rugs,
-      Category.Shoes,
-      Category.Socks,
-      Category.Tools,
-      Category.Tops,
-      Category.Umbrellas,
-      Category.WallMounted,
-      Category.Wallpaper
-    ].map(v => ({ key: v, name: this.t.Category(v) }));
-  }
 
-  Process(i: Item) {
-    const r = i as Item & { nameJ: string, nameH: string; };
-    r.nameJ = i.translations?.japanese || i.name;
-    r.nameH = moji(r.nameJ).convert('KK', 'HG').toString();
-    return r;
-  }
 
   /**
    * @description 非破壊的
@@ -105,4 +114,11 @@ export class DataService {
   }
 }
 
-"あいうえおかきくけこ";
+export type ItemJ = Item & {
+  nameJ: string;
+  nameH: string;
+};
+export type IRecipeJ = IRecipe & {
+  nameJ: string;
+  nameH: string;
+};

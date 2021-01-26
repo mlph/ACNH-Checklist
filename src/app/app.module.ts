@@ -16,12 +16,16 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { RecipeComponent } from './components/recipe/recipe.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TableComponent,
-    MenuComponent
+    MenuComponent,
+    RecipeComponent,
   ],
   imports: [
     BrowserModule,
@@ -38,6 +42,8 @@ import { MatIconModule } from '@angular/material/icon';
     MatButtonToggleModule,
     MatMenuModule,
     MatIconModule,
+    MatTableModule,
+    ScrollingModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

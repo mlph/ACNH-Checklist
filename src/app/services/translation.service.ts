@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
+import { npcs, seasonsAndEvents, translations } from 'animal-crossing';
 import { Catalog, Category } from 'animal-crossing/lib/types/Item';
+import { Type } from 'animal-crossing/lib/types/SeasonsAndEvents';
+import { Personality } from 'animal-crossing/lib/types/Villager';
 
 @Injectable({
   providedIn: 'root'
@@ -10,46 +13,55 @@ export class TranslationService {
 
 
   ItemsSource(source?: string | null) {
-    // switch (source) {
-    //   case "Crafting": return "DIY";
-    //   case "Nook Miles Redemption": return "たぬきマイレージ";
-    //   case "Nook's Cranny": return "たぬき商店";
-    //   case "Saharah": return "ローラン";
-    //   case "Redd's Raffle": return "つねきちのくじ";
-    //   case "Cyrus": return "カイゾー";
-    //   case "Gullivarrr": return "かいぞく";
-    //   case "Mom": return "はは";
-    //   case "Kicks": return "シャンク";
-    //   case "C.J.": return "ジャスティン";
-    //   case "Nook Shopping Seasonal": return "たぬきショッピング 季節の商品";
-    //   case "Flick": return "レックス";
-    //   case "Dodo Airlines": return "ドードーエアライン";
-    //   case "Jolly Redd's Treasure Trawler": return "つねきちの船";
-    //   case "Able Sisters": return "エイブルシスターズ";
-    //   case "Label": return "ことの";
-    //   case "Gulliver": return "ジョニー";
-    //   case "Nintendo": return "ニンテンドー";
-    //   default: return no(source);
-    // }
     if (!source) {
       return no(source);
     }
-    const c: Record<string, string> = {
-      Saharah: "ローラン", Gullivarrr: "かいぞく", "C.J.": "ジャスティン", Flick: "レックス",
-      Label: "ことの", Gulliver: "ジョニー", Kicks: "シャンク", Leif: "レイジ",
-      Pascal: "ラコスケ", "Daisy Mae": "ウリ",
-      Cyrus: "カイゾー", Reese: "リサ", Franklin: "フランクリン", Jack: "パンプキング",
-      Jingle: "ジングル", Zipper: "ぴょんたろう", Rover: "みしらぬネコ",
-      "Tom Nook": "たぬきち", "K.K. concert": "とたけけ", Isabelle: "しずえ", Wilbur: "ロドリー", Blathers: "フータ",
-      Villagers: "島民", "All villagers": "島民",
-      Mom: "はは", Nintendo: "ニンテンドー", Luna: "ゆめみ", HHA: "ハッピーホームアカデミー",
+    const n = npcs.find(v => v.name === source);
+    if (n) {
+      return n.translations.japanese;
+    }
 
-      "Catching with a net": "あみでキャッチする", "Fishing": "つり",
-      "Hardwood Tree": "こうようじゅ", "Cedar Tree": "しんようじゅ",
-      "Cherry Tree": "さくらんぼの木", "Apple Tree": "リンゴの木", "Coconut Tree": "ヤシの木",
-      "Orange Tree": "オレンジの木", "Peach Tree": "モモの木", "Pear Tree": "ナシの木",
-      "Chopping a bamboo tree": "竹を切る", "Chopping a tree": "木を切る",
-      "Shaking a hardwood or cedar tree": "木を揺する",
+    const c: Record<string, string> = {
+      // Saharah: "ローラン", Gullivarrr: "かいぞく", "C.J.": "ジャスティン", Flick: "レックス",
+      // Label: "ことの", Gulliver: "ジョニー", Kicks: "シャンク", Leif: "レイジ",
+      // Pascal: "ラコスケ", "Daisy Mae": "ウリ",
+      // Cyrus: "カイゾー", Reese: "リサ", Franklin: "フランクリン", Jack: "パンプキング",
+      // Jingle: "ジングル", Zipper: "ぴょんたろう", Rover: "みしらぬネコ",
+      // "Tom Nook": "たぬきち", "K.K. concert": "とたけけ", Isabelle: "しずえ", Wilbur: "ロドリー", Blathers: "フータ",
+      //  Luna: "ゆめみ",
+      Villagers: "島民", "All villagers": "島民", "Snowboy": "ゆきだるま",
+      "All villagers (while stung)": "ハチに刺された状態で島民に話しかける",
+
+      Mom: "はは", Nintendo: "ニンテンドー", HHA: "ハッピーホームアカデミー",
+      "K.K. concert": "とたけけライブ",
+
+      "Catching with a net": "あみでキャッチする", "Fishing": "つり", "Hitting a rock": "岩を叩く",
+      "Balloons": "風船", "Dive spot": "ダイビング",
+      "Glowing dig spot": "光る地面", "Dig Spot": "地面に埋まっている", "Clam dig spot": "砂浜に埋まっている",
+      "Burying bells in a glowing spot": "光る地面にベルを埋める",
+      "Digging up clams": "アサリを掘り出す",
+
+      "Completing bug Critterpedia": "ムシ図鑑コンプリート", "Completing fish Critterpedia": "サカナ図鑑コンプリート",
+      "Breaking 100 axes": "斧を100個壊す", "Gold balloon": "金の風船", "Helping Gulliver 30 times": "ジョニーを30回助ける",
+
+      "Hardwood Tree": "こうようじゅ", "Planting a sapling": "きのなえを植える",
+      "Cedar Tree": "しんようじゅ", "Planting a cedar sapling": "しんようじゅのなえを植える",
+      "Cherry Tree": "さくらんぼの木", "Planting a cherry": "さくらんぼを植える", "Apple Tree": "リンゴの木", "Planting an apple": "リンゴを植える",
+      "Coconut Tree": "ヤシの木", "Planting a coconut": "ヤシのみを植える", "Orange Tree": "オレンジの木", "Planting an orange": "オレンジを植える",
+      "Peach Tree": "モモの木", "Planting a peach": "モモを植える", "Pear Tree": "ナシの木", "Planting a pear": "ナシを植える",
+      "Chopping a tree": "木を切る", "Shaking a hardwood or cedar tree": "木を揺する",
+
+      "Chopping a bamboo tree": "竹を切る", "Planting a bamboo shoot": "たけのこを植える",
+
+      "Seed bag": "たね",
+      "Picking flowers": "花を摘む", "Breeding": "花の交配",
+      "Picking pumpkins": "かぼちゃを収穫する",
+      "Digging up a fully grown bush": "育った低木をスコップで掘る",
+      "Digging up a pumpkin plant": "かぼちゃのなえをスコップで掘る",
+
+      "On ground": "地面に落ちている",
+      Beach: "すなはま",
+
       Crafting: "DIY",
 
       "Nook's Cranny": "たぬき商店",
@@ -59,7 +71,7 @@ export class TranslationService {
       "Nook Shopping Posters": "たぬきショッピング ポスター",
       "Recycle box": "リサイクルボックス",
 
-      "Jolly Redd's Treasure Trawler": "つねきちの船",
+      "Jolly Redd's Treasure Trawler": "つねきちのいなりマーケット",
       "Redd's Raffle": "つねきちのくじ",
       "Dodo Airlines": "ドードーエアライン",
       "Able Sisters": "エイブルシスターズ",
@@ -70,25 +82,72 @@ export class TranslationService {
       "Starting items": "はじめから持っている",
       "High Friendship": "島民と仲良くなる",
       "Wishing on shooting stars": "流れ星",
-      "Check Toy Day stockings the day after Toy Day": "クリスマスプレゼント",
+      "5-star town status": "島の評価☆5",
       Birthday: "たんじょうび",
 
-      Beach: "すなはま"
-    };
-    return c[source] || no(source);
-  }
-  // "Planting an apple", "Planting a coconut", "Planting an orange", "Planting a pear", "Planting a peach", "Planting a cherry",
-  // "Planting a cedar sapling", "Planting a bamboo shoot", "Planting a sapling", "Burying bells in a glowing spot",
-  // "Picking flowers", "Breeding",
+      "Don't return lost item": "落とし物を返さない",
+      "Wrapping a present": "プレゼントをラッピングする",
+      "Wrapping a present using festive wrapping paper": "クリスマスなラッピングペーパーでラッピングする",
+      "Expired turnips": "カブを腐らせる",
+      "Mail": "手紙", "Nook Shopping": "たぬきショッピング",
+      "Don't return treasure quest item": "宝さがしで見つけたアイテムを返さない",
+      "Delivering item for a villager": "お届け物",
+      "Use a fountain firework": "おきはなびを使う",
 
-  // "Glowing dig spot", "Dig Spot",
-  // "May Day Tour", "Don't return lost item", "Don't return treasure quest item",
-  // "Digging up a fully grown bush",
-  // "Hitting a rock", "On ground",
-  // "Dive spot", "Clam dig spot", "Nook Shopping",
-  // "Delivering item for a villager", "Wrapping a present using festive wrapping paper", "Picking pumpkins",
-  // "Snowboy", "5-star town status", "Seed bag",
-  // "Mail", "Wrapping a present", "Digging up a pumpkin plant", "Egg balloon", "Expired turnips", "Use a fountain firework";
+      "Check Toy Day stockings the day after Toy Day": "クリスマスプレゼント",
+      "Egg balloon": "イースターの風船", "May Day Tour": "メーデーツアー",
+      "Egg bottle": "たまごのメッセージボトル",
+      "Collecting earth eggs": "じめんのたまごを集める", "Collecting leaf eggs": "はっぱのたまごを集める", "Collecting water eggs": "サカナのたまごを集める",
+      "Collecting stone eggs": "いわのたまごを集める", "Collecting sky eggs": "そらとぶたまごを集める", "Collecting wood eggs": "ウッディなたまごを集める",
+      "Learning all egg outfit DIYs": "イースターの服のレシピを全てひらめく",
+    };
+
+    [Personality.Lazy, Personality.Smug,
+    Personality.BigSister, Personality.Peppy,
+    Personality.Normal, Personality.Jock,
+    Personality.Cranky, Personality.Snooty,].forEach(p => c[`${p} villagers`] = `島民:${this.Personarity(p)}`);
+
+
+    if (c[source]) {
+      return c[source];
+    }
+
+    // "Cozy Turkey Day DIY", "Pretty Good Tools Recipes", "Wildest Dreams DIY", "DIY for Beginners", "Test Your DIY Skills",
+    const i = translations.find(t => t.english === source);
+    if (i) {
+      return i.japanese;
+    }
+    return no(source);
+  }
+
+
+  SeasonsAndEvents(s?: string | null) {
+    if (!s) {
+      return "";
+    }
+    const c: Record<string, string> = {
+      "Halloween": "ハロウィン", "Toy Day": "クリスマスイブ", "Wedding Season": "ジューンブライド",
+      "ornaments": "オーナメント", "mushrooms": "キノコ", "acorns and pine cones": "きのみ","Nature day":"アースデー"
+    };
+    return s.split("; ").map(ss => {
+      if (ss.includes("ready days") || ss.includes("shopping days")) {
+        return "";
+      }
+      if (c[ss]) {
+        return c[ss];
+      }
+      const se = seasonsAndEvents.find(e => e.name === ss);
+      if (se) {
+        if(se.type === Type.ZodiacSeason){
+          return se.translations?.japanese + "ざ"
+        }
+        return se.translations?.japanese || no(ss);
+      }
+      return no(ss);
+    }).filter(v => v).join(" , ");
+
+    // return no(s);
+  }
 
   Catalog(s?: Catalog | null) {
     switch (s) {
@@ -129,6 +188,19 @@ export class TranslationService {
       case Category.WallMounted: return "かべかけ";
       case Category.Wallpaper: return "かべがみ";
       default: return c;
+    }
+  }
+
+  Personarity(p: Personality) {
+    switch (p) {
+      case Personality.Lazy: return "ぼんやり";
+      case Personality.Normal: return "ふつう";
+      case Personality.Peppy: return "げんき";
+      case Personality.Jock: return "はきはき";
+      case Personality.Cranky: return "こわい";
+      case Personality.Snooty: return "おとな";
+      case Personality.BigSister: return "あねき";
+      case Personality.Smug: return "キザ";
     }
   }
 
