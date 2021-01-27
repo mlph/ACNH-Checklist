@@ -1,7 +1,9 @@
 <mat-toolbar>
-    <mat-checkbox [(ngModel)]="settings.showimage" (ngModelChange)="settings.settingChanged.next({prop:'showimage',data:settings.showimage})">image</mat-checkbox>
-    <mat-checkbox [(ngModel)]="settings.showdata" (ngModelChange)="settings.settingChanged.next({prop:'showdata',data:settings.showdata})">data</mat-checkbox>
-    <mat-checkbox [(ngModel)]="settings.showVariations" (ngModelChange)="settings.settingChanged.next({prop:'showVariations',data:settings.showVariations})">variations</mat-checkbox>
+    <mat-checkbox *ngFor="let s of settings.itemskey" [(ngModel)]="settings.items[s]" (change)="TableColumns()">{{s}}
+    </mat-checkbox>
+    <!-- <mat-checkbox [(ngModel)]="settings.items.image" (ngModelChange)="settings.settingChanged.next({prop:'showimage',data:settings.showimage})">image</mat-checkbox>
+    <mat-checkbox [(ngModel)]="settings.items.data" (ngModelChange)="settings.settingChanged.next({prop:'showdata',data:settings.showdata})">data</mat-checkbox>
+    <mat-checkbox [(ngModel)]="settings.items.variants" (ngModelChange)="settings.settingChanged.next({prop:'showVariations',data:settings.showVariations})">variations</mat-checkbox> -->
 </mat-toolbar>
 <mat-form-field>
     <input matInput [(ngModel)]="page" type="number" (change)="Filter()">
@@ -71,7 +73,12 @@
 <table mat-table [dataSource]="showingData" matSort (matSortChange)="ReSort($event)" matSortActive="name"
     matSortDirection="asc">
     <ng-container *ngFor="let c of colDataSimple" [matColumnDef]="c.id">
-        <th [class]="['h_'+c.id]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>{{c.header}}</th>
+        <ng-container *ngIf="c.sort;else nosort">
+            <th [class]="['h_'+c.id]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>{{c.header}}</th>
+        </ng-container>
+        <ng-template #nosort>
+            <th [class]="['h_'+c.id]" mat-header-cell *matHeaderCellDef>{{c.header}}</th>
+        </ng-template>
         <td mat-cell *matCellDef="let element"> {{c.data(element)}} </td>
     </ng-container>
 
@@ -80,7 +87,7 @@
         <td mat-cell *matCellDef="let element">
             <div class="image">
                 <div *ngFor="let s of colData.image.data(element)">
-                    <div class="image-name">{{s.name}}</div>
+                    <div class="image-name">{{s.name}} </div>
                     <img [src]="s.src" [id]="s.name">
                 </div>
             </div>
@@ -109,13 +116,33 @@
         </td>
     </ng-container>
     <ng-container [matColumnDef]="colData.variations.id">
-        <th class="h_variations" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>バリエーション</th>
+        <th class="h_variations" mat-header-cell *matHeaderCellDef>バリエーション</th>
         <td class="d_variations" mat-cell *matCellDef="let element">
             <div>
-                <div *ngFor="let s of element.variations;let i = index">{{colData.variations.ja(s)}}<ng-container
-                        *ngIf="IsNotLast(i, element.variations)"> , </ng-container>
-                </div>
+                <ng-container *ngIf="!element.variations;else vari">
+                    <button mat-icon-button (click)="colData.check.checked(element)">
+                        <mat-icon>{{colData.check.icon(element)}}</mat-icon>
+                    </button>
+                </ng-container>
+                <ng-template #vari>
+                    <ng-container *ngFor="let s of element.variations;let i = index">
+                        <div>
+                            <mat-checkbox [checked]="colData.variations.isChecked(element, s)"
+                                (change)="colData.variations.check(element, s)">{{colData.variations.ja(s)}}
+                            </mat-checkbox>
+                            <!-- <ng-container *ngIf="IsNotLast(i, element.variations)">,</ng-container> -->
+                        </div>
+                    </ng-container>
+                </ng-template>
             </div>
+        </td>
+    </ng-container>
+    <ng-container [matColumnDef]="colData.check.id">
+        <th class="h_checked" mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element" (click)="colData.check.checked(element)">
+            <button mat-icon-button>
+                <mat-icon>{{colData.check.icon(element)}}</mat-icon>
+            </button>
         </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="col"></tr>

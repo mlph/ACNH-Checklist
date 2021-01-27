@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Sort } from '@angular/material/sort';
 import { Catalog, Category, Item, VariationElement } from 'animal-crossing/lib/types/Item';
-import { DataService, ItemJ } from 'src/app/services/data.service';
+import { DataService, ItemJ, variantId } from 'src/app/services/data.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { TranslationService } from 'src/app/services/translation.service';
 
@@ -34,22 +34,26 @@ export class TableComponent implements OnInit {
     {
       id: "name",
       header: "なまえ",
-      data: (i: ItemJ) => i.nameJ
+      data: (i: ItemJ) => i.nameJ,
+      sort: true
     },
     {
       id: "catalog",
       header: "カタログ",
-      data: (i: ItemJ) => this.t.Catalog(i.catalog)
+      data: (i: ItemJ) => this.t.Catalog(i.catalog),
+      sort: true
     },
     {
       id: "raw",
       header: "データ",
-      data: (i: ItemJ) => JSON.stringify(i, undefined, 2)
+      data: (i: ItemJ) => JSON.stringify(i, undefined, 2),
+      sort: false
     },
     {
       id: "var",
       header: "",
-      data: (i: ItemJ) => i.variations?.length || ""
+      data: (i: ItemJ) => i.variations?.length || "",
+      sort: false
     }
   ];
 
@@ -63,16 +67,6 @@ export class TableComponent implements OnInit {
             result.push({ src: v });
           }
         });
-        // const im = i.image || i.storageImage || i.inventoryImage || i.closetImage;
-        // if (im) {
-        //   return [{ src: im }];
-        // }
-        // if (i.albumImage && i.framedImage) {
-        //   return [
-        //     { src: i.albumImage },
-        //     { src: i.framedImage }
-        //   ];
-        // }
         if (i.variations) {
           result.push(...i.variations.map(v => ({
             src: v.image || v.closetImage || v.storageImage || "",
@@ -87,11 +81,46 @@ export class TableComponent implements OnInit {
     },
     variations: {
       id: "variations",
-      ja: (v: VariationElement) => v.variantTranslations?.japanese || v.patternTranslations?.japanese
+      ja: (v: VariationElement) => v.variantTranslations?.japanese || "" + v.patternTranslations?.japanese || "",
+      isChecked: (i: ItemJ, v: VariationElement) => i.checked.variants.find(va => va.variantId === variantId(v))?.checked || false,
+      check: (i: ItemJ, v: VariationElement) => {
+        const vari = i.checked.variants.find(va => va.variantId === variantId(v));
+        if (vari) {
+          vari.checked = !vari.checked;
+        }
+        if (i.variations) {
+          if (i.checked.variants.every(va => va.checked)) {
+            i.checked.base = "true";
+          } else if (i.checked.variants.every(va => !va.checked)) {
+            i.checked.base = "false";
+          } else {
+            i.checked.base = "partial";
+          }
+        }
+        this.settings.checklist.items[i.internalId] = i.checked;
+      }
     },
     var: {
       id: "var",
       exist: (i: ItemJ) => !!i.variations
+    },
+    check: {
+      id: "check",
+      icon: (i: ItemJ) => {
+        switch (i.checked.base) {
+          case "true": return "check_box";
+          case "false": return "check_box_outline_blank";
+          case "partial": return "indeterminate_check_box";
+        }
+      },
+      checked: (i: ItemJ) => {
+        if (i.variations && i.variations.length > 0) {
+        } else {
+          i.checked.base = i.checked.base === "false" ? "true" : "false";
+        }
+        this.settings.checklist.items[i.internalId] = i.checked;
+      },
+      isChecked: (i: ItemJ) => i.checked.base === "true"
     }
   };
 
@@ -148,14 +177,15 @@ export class TableComponent implements OnInit {
   }
 
   TableColumns() {
-    this.col = ["name", this.colData.var.id, this.colData.image.id, "source", "catalog", this.colData.variations.id, "raw"];
-    if (!this.settings.showimage) {
+    this.col = [this.colData.check.id, "name", this.colData.var.id, this.colData.image.id, "source", "catalog", this.colData.variations.id, "raw"];
+    // console.log(this.settings.items)
+    if (!this.settings.items.image) {
       this.col = this.col.filter(v => v !== this.colData.image.id);
     }
-    if (!this.settings.showdata) {
+    if (!this.settings.items.data) {
       this.col = this.col.filter(v => v !== "raw");
     }
-    if (!this.settings.showVariations) {
+    if (!this.settings.items.variants) {
       this.col = this.col.filter(v => v !== this.colData.variations.id);
     }
   }
@@ -262,7 +292,7 @@ export class TableComponent implements OnInit {
     current.state = states[(i + 1) % states.length];
     this.Filter();
   }
-}
+};
 
 
 

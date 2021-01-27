@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { items, npcs, recipes, translations, construction, IRecipe, villagers, seasonsAndEvents } from "animal-crossing";
-import { Category, Item } from 'animal-crossing/lib/types/Item';
+import { Category, Item, VariationElement } from 'animal-crossing/lib/types/Item';
 import { TranslationService } from './translation.service';
 
 import { NihongoService } from './nihongo.service';
 import { SourceSheet } from 'animal-crossing/lib/types/Translation';
 import { Personality } from 'animal-crossing/lib/types/Villager';
+import { SettingsService, threeState } from './settings.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,8 @@ export class DataService {
 
   constructor(
     private t: TranslationService,
-    private nihongo: NihongoService
+    private nihongo: NihongoService,
+    private settings: SettingsService
   ) {
     this.Init();
     // this.Categories();
@@ -51,12 +53,33 @@ export class DataService {
         r.nameJ = t[r.name] || r.name;
       }
       r.nameH = this.nihongo.toHiragana(r.nameJ);
+      const id = (() => {
+        if (r.internalId != null) {
+          return r.internalId;
+        }
+        return r.translations?.id || -1;
+      })();
+      r.internalId = id;
+      r.checked = this.settings.checklist.items[id];
+      if (r.checked == null) {
+        const c: { base: threeState, variants: { variantId: string; checked: boolean; }[]; } = {
+          base: "false",
+          variants: (r.variations || [])
+            .map(v => ({ variantId: variantId(v), checked: false }))
+        };
+
+        r.checked = c;
+      };
+
+      // (r.variations || []).filter(v => !v.variantId && !v.variation).forEach(c => console.log(c));
+
       return r;
     };
     const Process2 = (i: IRecipe) => {
       const r = i as IRecipeJ;
       r.nameJ = i.translations?.japanese || i.name;
       r.nameH = this.nihongo.toHiragana(r.nameJ);
+      r.checked = !!this.settings.checklist.recipes[r.internalId];
       return r;
     };
 
@@ -92,6 +115,8 @@ export class DataService {
     // a.forEach(s=>console.log(translations.find(t=>t.sourceSheet === s)))
 
     // console.log(seasonsAndEvents);
+    // console.log(items.filter(i => !i.internalId && !i.translations?.id));
+    // console.log(recipes.filter(i => !i.internalId ));
   }
 
 
@@ -117,8 +142,19 @@ export class DataService {
 export type ItemJ = Item & {
   nameJ: string;
   nameH: string;
+  internalId: number;
+  checked: {
+    base: threeState;
+    variants: {
+      variantId: string;
+      checked: boolean;
+    }[];
+  };
 };
 export type IRecipeJ = IRecipe & {
   nameJ: string;
   nameH: string;
+  checked: boolean;
 };
+
+export const variantId = (v: VariationElement) => v.variantId || v.variation?.toString() || "undefined";

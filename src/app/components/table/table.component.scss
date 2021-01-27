@@ -33,7 +33,7 @@ table{
     .d_variations>div{
         max-width: 300px;
         max-height: 150px;
-        overflow: auto;
+        // overflow: auto;
         display: flex;
         flex-wrap: wrap;
     }

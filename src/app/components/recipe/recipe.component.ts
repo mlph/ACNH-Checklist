@@ -76,6 +76,19 @@ export class RecipeComponent implements OnInit {
     //   id: "var",
     //   exist: (i: ItemJ) => !!i.variations
     // }
+    check: {
+      id: "check",
+      icon: (i: IRecipeJ) => {
+        switch (i.checked) {
+          case true: return "check_box";
+          case false: return "check_box_outline_blank";
+        }
+      },
+      checked: (i: IRecipeJ) => {
+        i.checked = !i.checked;
+        this.settings.checklist.recipes[i.internalId] = i.checked;
+      }
+    }
   };
 
   categories = [
@@ -107,11 +120,11 @@ export class RecipeComponent implements OnInit {
   }
 
   TableColumns() {
-    this.col = ["name", this.colData.image.id, "source", "raw", "event"];
-    if (!this.settings.showimage) {
+    this.col = [this.colData.check.id, "name", this.colData.image.id, "source", "raw", "event"];
+    if (!this.settings.recipes.image) {
       this.col = this.col.filter(v => v !== this.colData.image.id);
     }
-    if (!this.settings.showdata) {
+    if (!this.settings.recipes.data) {
       this.col = this.col.filter(v => v !== "raw");
     }
     // if (!this.settings.showVariations) {

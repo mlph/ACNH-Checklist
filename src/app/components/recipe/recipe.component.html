@@ -1,6 +1,8 @@
 <mat-toolbar>
-    <mat-checkbox [(ngModel)]="settings.showimage" (ngModelChange)="settings.settingChanged.next({prop:'showimage',data:settings.showimage})">image</mat-checkbox>
-    <mat-checkbox [(ngModel)]="settings.showdata" (ngModelChange)="settings.settingChanged.next({prop:'showdata',data:settings.showdata})">data</mat-checkbox>
+    <mat-checkbox *ngFor="let s of settings.recipeskey" [(ngModel)]="settings.recipes[s]" (change)="TableColumns()">
+        {{s}}</mat-checkbox>
+    <!-- <mat-checkbox [(ngModel)]="settings.showimage" (ngModelChange)="settings.settingChanged.next({prop:'showimage',data:settings.showimage})">image</mat-checkbox>
+    <mat-checkbox [(ngModel)]="settings.showdata" (ngModelChange)="settings.settingChanged.next({prop:'showdata',data:settings.showdata})">data</mat-checkbox> -->
     <!-- <mat-checkbox [(ngModel)]="settings.showVariations" (ngModelChange)="settings.settingChanged.next({prop:'showVariations',data:settings.showVariations})">variations</mat-checkbox> -->
 </mat-toolbar>
 <mat-form-field>
@@ -39,6 +41,14 @@
         <td mat-cell *matCellDef="let element"> {{c.data(element)}} </td>
     </ng-container>
 
+    <ng-container [matColumnDef]="colData.check.id">
+        <th class="h_checked" mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element" (click)="colData.check.checked(element)">
+            <button mat-icon-button>
+                <mat-icon>{{colData.check.icon(element)}}</mat-icon>
+            </button>
+        </td>
+    </ng-container>
     <ng-container [matColumnDef]="colData.image.id">
         <th class="h_image" mat-header-cell *matHeaderCellDef>がぞう</th>
         <td mat-cell *matCellDef="let element">

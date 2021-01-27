@@ -1,6 +1,8 @@
 <mat-toolbar>
     <button mat-button routerLink="item">アイテム</button>
     <button mat-button routerLink="recipe">レシピ</button>
+    <div class="space"></div>
+    <button mat-button (click)="settings.save()">save</button>
 </mat-toolbar>
 
 <router-outlet></router-outlet>
