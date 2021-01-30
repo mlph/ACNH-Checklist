@@ -1,0 +1,9 @@
+<div cdkDropList (cdkDropListDropped)="drop($event)">
+    <mat-card *ngFor="let t of data.headers" cdkDrag>
+        <mat-card-content>
+            {{t.name}}
+            <mat-checkbox [(ngModel)]="t.enable" (ngModelChange)="check()">表示</mat-checkbox>
+            <mat-checkbox [(ngModel)]="t.toggleSwitch" (ngModelChange)="check()">ツールバーに表示</mat-checkbox>
+        </mat-card-content>
+    </mat-card>
+</div>

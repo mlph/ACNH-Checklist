@@ -1,0 +1,112 @@
+<mat-toolbar>
+    <button mat-icon-button (click)="OpenSettings()">
+        <mat-icon>settings</mat-icon>
+    </button>
+    <mat-checkbox *ngFor="let s of settings.headers('creatures', true)" [(ngModel)]="s.enable"
+        (change)="TableColumns()">
+        {{s.name}}
+    </mat-checkbox>
+</mat-toolbar>
+<mat-form-field>
+    <input matInput [(ngModel)]="page" type="number" (change)="Filter()">
+</mat-form-field>
+<mat-form-field>
+    <input matInput [(ngModel)]="row" type="number" (change)="Filter()">
+</mat-form-field>
+
+{{(page - 1) * row + 1}} - {{(page - 1) * row + showingData.length}} / {{filteredData.length}} / {{raw.length}}
+
+<div>
+    <mat-form-field>
+        <input matInput [(ngModel)]="search" (change)="Filter()">
+        <button mat-icon-button matSuffix (click)="search = '';Filter()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </mat-form-field>
+</div>
+
+<div class="categories">
+    <button mat-icon-button (click)="CategoryAll(categories)">
+        <mat-icon>weekend</mat-icon>
+    </button>
+    <button mat-raised-button *ngFor="let c of categories" (click)="CategoryButton(c)"
+        [class.active]="c.checked">{{c.name}}</button>
+</div>
+
+
+<mat-table [dataSource]="showingData" matSort (matSortChange)="ReSort($event)" matSortActive="id"
+    matSortDirection="asc">
+    <ng-container *ngFor="let c of colDataSimple" [matColumnDef]="c.id">
+        <ng-container *ngIf="c.sort;else nosort">
+            <mat-header-cell [class]="['h', c.id]" *matHeaderCellDef mat-sort-header disableClear>{{c.header}}
+            </mat-header-cell>
+        </ng-container>
+        <ng-template #nosort>
+            <mat-header-cell [class]="['h', c.id]" *matHeaderCellDef>{{c.header}}</mat-header-cell>
+        </ng-template>
+        <mat-cell [class]="['c', c.id]" *matCellDef="let element"> {{c.key ? element[c.key] : c.data(element)}}
+        </mat-cell>
+    </ng-container>
+
+    <ng-container *ngFor="let c of colDataImage" [matColumnDef]="c.id">
+        <mat-header-cell [class]="['h','image', c.id]" *matHeaderCellDef>{{c.header}}</mat-header-cell>
+        <mat-cell [class]="['c','image', c.id]" *matCellDef="let element"> <img [src]="element[c.key]"> </mat-cell>
+    </ng-container>
+
+    <!-- <ng-container [matColumnDef]="colData.image.id">
+        <mat-header-cell class="h_image" *matHeaderCellDef>がぞう</mat-header-cell>
+        <mat-cell *matCellDef="let element">
+            <div class="image">
+                <div *ngFor="let s of colData.image.data(element)">
+                    <div class="image-name">{{s.name}} </div>
+                    <img [src]="s.src" [id]="s.name">
+                </div>
+            </div>
+        </mat-cell>
+    </ng-container> -->
+    <!-- <ng-container [matColumnDef]="colData.var.id">
+        <mat-header-cell class="h_var" *matHeaderCellDef></mat-header-cell>
+        <mat-cell *matCellDef="let element">
+            <mat-icon *ngIf="colData.var.exist(element)">edit</mat-icon>
+        </mat-cell>
+    </ng-container> -->
+    <ng-container matColumnDef="period">
+        <mat-header-cell class="h period" *matHeaderCellDef>生息時期</mat-header-cell>
+        <mat-cell class="c period" *matCellDef="let element">
+            <div>
+                <div class="month">
+                    <div *ngFor="let i of _12" [class.active]="element.hemispheres.north.monthsArray.includes(i)">{{i}}月
+                    </div>
+                </div>
+                <div>
+                    <div class="time">
+                        <div *ngFor="let i of _24" [class]="'t_'+(i+1)"
+                            [class.active]="colData.period.time(element).includes(i)"></div>
+                    </div>
+                    <div class="time_string" *ngFor="let t of element.hemispheres.north.time">{{t}}</div>
+                </div>
+            </div>
+        </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="property">
+        <mat-header-cell class="h property" *matHeaderCellDef>特徴</mat-header-cell>
+        <mat-cell class="c property" *matCellDef="let element">
+            <ng-container *ngFor="let p of colData.property.data(element)">
+                <div>{{p.key}}</div>
+                <div>{{p.value}}</div>
+            </ng-container>
+        </mat-cell>
+    </ng-container>
+
+    <ng-container [matColumnDef]="colData.check.id">
+        <mat-header-cell class="check" *matHeaderCellDef></mat-header-cell>
+        <mat-cell class="check" *matCellDef="let element" (click)="colData.check.checked(element)">
+            <button mat-icon-button>
+                <mat-icon>{{colData.check.icon(element)}}</mat-icon>
+            </button>
+        </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="col"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: col;"></mat-row>
+</mat-table>

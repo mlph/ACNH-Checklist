@@ -1,7 +1,11 @@
 <mat-toolbar>
-    <button mat-button routerLink="item">アイテム</button>
-    <button mat-button routerLink="recipe">レシピ</button>
+    <button mat-button routerLink="item" routerLinkActive="active">アイテム</button>
+    <button mat-button routerLink="recipe" routerLinkActive="active">レシピ</button>
+    <button mat-button routerLink="creature" routerLinkActive="active">いきもの</button>
     <div class="space"></div>
+    <a href="https://github.com/Norviah/animal-crossing" target="_blank">
+        <button mat-button>元データ</button>
+    </a>
     <button mat-button (click)="settings.save()">save</button>
 </mat-toolbar>
 

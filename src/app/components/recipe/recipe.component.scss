@@ -2,28 +2,25 @@
     background-color: aqua;
 }
 
-table{
-    width: 95vw;
+mat-table{
+    // width: 95vw;
     // table-layout: fixed;
-    th{
-        // min-width: 5.5em;
-        &.h_var{
-            width: 3em;
-        }
-    }
-    .image{
-        display: flex;
-        width: 400px;
-        overflow-x: auto;
-        white-space: nowrap;
-        .image-name{
-            font-size: small;
-        }
-    }
+    // .image{
+    //     display: flex;
+    //     max-width: 400px;
+    //     overflow-x: auto;
+    //     white-space: nowrap;
+    //     .image-name{
+    //         font-size: small;
+    //     }
+    // }
     img{
         max-height: 128px;
     }
 
+    .check{
+        max-width: 3em;
+    }
 
     .d_source>div{
         display: flex;

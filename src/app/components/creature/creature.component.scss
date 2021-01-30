@@ -1,0 +1,79 @@
+.categories{
+    .active{
+        background-color: aqua;
+    }
+}
+
+mat-table{
+    img{
+        max-height: 128px;
+    }
+
+    mat-header-cell,mat-cell{
+        flex-grow: 1;
+    }
+
+    // .image{
+    //     max-width: 240px;
+    // }
+
+    .check, .id{
+        max-width: 3em;
+    }
+
+    .d_source>div{
+        display: flex;
+        align-items: center;
+        >div{
+            display: flex;
+            flex-wrap: wrap;
+        }
+    }
+
+    .period>div{
+        display: flex;
+    }
+
+    .month{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        color: lightgray;
+
+        $b: gray 1px solid;
+
+        border-top: $b;
+        border-left: $b;
+        >div{
+            border-bottom: $b;
+            border-right: $b;
+        }
+        .active{
+            background-color: yellowgreen;
+            color: black;
+        }
+    }
+    .time{
+        display: grid;
+        grid-template-columns: repeat(24, 1fr);
+        color: lightgray;
+
+        $b: gray 1px solid;
+
+        border-left: $b;
+        >div{
+            width: 6px;
+            height: 6px;
+            content: "";
+            border-right: $b;
+        }
+        .active{
+            background-color: yellowgreen;
+            color: black;
+        }
+    }
+
+    .c.property{
+        display: grid;
+        grid-template-columns: repeat(2, auto);
+    }
+}

@@ -1,9 +1,10 @@
 <mat-toolbar>
-    <mat-checkbox *ngFor="let s of settings.itemskey" [(ngModel)]="settings.items[s]" (change)="TableColumns()">{{s}}
+    <button mat-icon-button (click)="OpenSettings()">
+        <mat-icon>settings</mat-icon>
+    </button>
+    <mat-checkbox *ngFor="let s of settings.headers('items', true)" [(ngModel)]="s.enable" (change)="TableColumns()">
+        {{s.name}}
     </mat-checkbox>
-    <!-- <mat-checkbox [(ngModel)]="settings.items.image" (ngModelChange)="settings.settingChanged.next({prop:'showimage',data:settings.showimage})">image</mat-checkbox>
-    <mat-checkbox [(ngModel)]="settings.items.data" (ngModelChange)="settings.settingChanged.next({prop:'showdata',data:settings.showdata})">data</mat-checkbox>
-    <mat-checkbox [(ngModel)]="settings.items.variants" (ngModelChange)="settings.settingChanged.next({prop:'showVariations',data:settings.showVariations})">variations</mat-checkbox> -->
 </mat-toolbar>
 <mat-form-field>
     <input matInput [(ngModel)]="page" type="number" (change)="Filter()">
@@ -48,60 +49,40 @@
 </div>
 
 
-<!-- <table matSort (matSortChange)="ReSort($event)" matSortActive="name" matSortDirection="asc">
-    <tr>
-        <th mat-sort-header="name" disableClear>なまえ</th>
-        <th *ngIf="settings.show.image">がぞう</th>
-        <th mat-sort-header="source" disableClear>入手手段</th>
-        <th mat-sort-header="catalog" disableClear>カタログ</th>
-    </tr>
-    <tr *ngFor="let r of showingData">
-        <td>{{r.translations?.japanese}}</td>
-        <td *ngIf="settings.show.image"><img [src]="r.image"></td>
-        <td>
-            <span *ngFor="let s of r.source;let i = index">{{t.ItemsSource(s)}}<ng-container
-                    *ngIf="IsNotLast(i, r.source)"> , </ng-container></span>
-            <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="r.sourceNotes">
-                <mat-icon>speaker_notes</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">{{r.sourceNotes}}</mat-menu>
-        </td>
-        <td>{{t.Catalog(r.catalog)}}</td>
-    </tr>
-</table> -->
 
-<table mat-table [dataSource]="showingData" matSort (matSortChange)="ReSort($event)" matSortActive="name"
+<mat-table [dataSource]="showingData" matSort (matSortChange)="ReSort($event)" matSortActive="name"
     matSortDirection="asc">
     <ng-container *ngFor="let c of colDataSimple" [matColumnDef]="c.id">
         <ng-container *ngIf="c.sort;else nosort">
-            <th [class]="['h_'+c.id]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>{{c.header}}</th>
+            <mat-header-cell [class]="['h_'+c.id]" *matHeaderCellDef mat-sort-header disableClear>{{c.header}}
+            </mat-header-cell>
         </ng-container>
         <ng-template #nosort>
-            <th [class]="['h_'+c.id]" mat-header-cell *matHeaderCellDef>{{c.header}}</th>
+            <mat-header-cell [class]="['h_'+c.id]" *matHeaderCellDef>{{c.header}}</mat-header-cell>
         </ng-template>
-        <td mat-cell *matCellDef="let element"> {{c.data(element)}} </td>
+        <mat-cell *matCellDef="let element"> {{c.data(element)}} </mat-cell>
     </ng-container>
 
     <ng-container [matColumnDef]="colData.image.id">
-        <th class="h_image" mat-header-cell *matHeaderCellDef>がぞう</th>
-        <td mat-cell *matCellDef="let element">
+        <mat-header-cell class="h_image" *matHeaderCellDef>がぞう</mat-header-cell>
+        <mat-cell *matCellDef="let element">
             <div class="image">
                 <div *ngFor="let s of colData.image.data(element)">
                     <div class="image-name">{{s.name}} </div>
                     <img [src]="s.src" [id]="s.name">
                 </div>
             </div>
-        </td>
+        </mat-cell>
     </ng-container>
     <!-- <ng-container [matColumnDef]="colData.var.id">
-        <th class="h_var" mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let element">
+        <mat-header-cell class="h_var" *matHeaderCellDef></mat-header-cell>
+        <mat-cell *matCellDef="let element">
             <mat-icon *ngIf="colData.var.exist(element)">edit</mat-icon>
-        </td>
+        </mat-cell>
     </ng-container> -->
     <ng-container [matColumnDef]="colData.source.id">
-        <th class="h_source" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>入手手段</th>
-        <td class="d_source" mat-cell *matCellDef="let element">
+        <mat-header-cell class="h_source" *matHeaderCellDef mat-sort-header disableClear>入手手段</mat-header-cell>
+        <mat-cell class="d_source" *matCellDef="let element">
             <div>
                 <div>
                     <div *ngFor="let s of element.source;let i = index">{{t.ItemsSource(s)}}<ng-container
@@ -113,16 +94,18 @@
                 </button>
                 <mat-menu #menu="matMenu">{{element.sourceNotes}}</mat-menu>
             </div>
-        </td>
+        </mat-cell>
     </ng-container>
     <ng-container [matColumnDef]="colData.variations.id">
-        <th class="h_variations" mat-header-cell *matHeaderCellDef>バリエーション</th>
-        <td class="d_variations" mat-cell *matCellDef="let element">
+        <mat-header-cell class="h_variations" *matHeaderCellDef>バリエーション</mat-header-cell>
+        <mat-cell class="d_variations" *matCellDef="let element">
             <div>
                 <ng-container *ngIf="!element.variations;else vari">
                     <button mat-icon-button (click)="colData.check.checked(element)">
                         <mat-icon>{{colData.check.icon(element)}}</mat-icon>
                     </button>
+                    <!-- <mat-checkbox [checked]="colData.check.isChecked(element)"
+                        (ngModelChange)="colData.check.checked(element)"></mat-checkbox> -->
                 </ng-container>
                 <ng-template #vari>
                     <ng-container *ngFor="let s of element.variations;let i = index">
@@ -135,16 +118,16 @@
                     </ng-container>
                 </ng-template>
             </div>
-        </td>
+        </mat-cell>
     </ng-container>
     <ng-container [matColumnDef]="colData.check.id">
-        <th class="h_checked" mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let element" (click)="colData.check.checked(element)">
+        <mat-header-cell class="check" *matHeaderCellDef></mat-header-cell>
+        <mat-cell class="check" *matCellDef="let element" (click)="colData.check.checked(element)">
             <button mat-icon-button>
                 <mat-icon>{{colData.check.icon(element)}}</mat-icon>
             </button>
-        </td>
+        </mat-cell>
     </ng-container>
-    <tr mat-header-row *matHeaderRowDef="col"></tr>
-    <tr mat-row *matRowDef="let row; columns: col;"></tr>
-</table>
+    <mat-header-row *matHeaderRowDef="col"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: col;"></mat-row>
+</mat-table>

@@ -2,18 +2,16 @@
     background-color: aqua;
 }
 
-table{
-    width: 95vw;
-    // table-layout: fixed;
-    th{
-        // min-width: 5.5em;
-        &.h_var{
-            width: 3em;
-        }
-    }
+mat-table{
+    // th{
+    //     // min-width: 5.5em;
+    //     &.h_var{
+    //         width: 3em;
+    //     }
+    // }
     .image{
         display: flex;
-        width: 400px;
+        max-width: 400px;
         overflow-x: auto;
         white-space: nowrap;
         .image-name{
@@ -24,6 +22,9 @@ table{
         max-height: 128px;
     }
 
+    .check{
+        max-width: 3em;
+    }
     // .h_image{
     //     max-width: 50vw;
     // }
@@ -33,9 +34,10 @@ table{
     .d_variations>div{
         max-width: 300px;
         max-height: 150px;
-        // overflow: auto;
+        overflow: auto;
         display: flex;
         flex-wrap: wrap;
+        padding: 0.6em 0;
     }
 
     .d_source>div{

@@ -1,9 +1,10 @@
 <mat-toolbar>
-    <mat-checkbox *ngFor="let s of settings.recipeskey" [(ngModel)]="settings.recipes[s]" (change)="TableColumns()">
-        {{s}}</mat-checkbox>
-    <!-- <mat-checkbox [(ngModel)]="settings.showimage" (ngModelChange)="settings.settingChanged.next({prop:'showimage',data:settings.showimage})">image</mat-checkbox>
-    <mat-checkbox [(ngModel)]="settings.showdata" (ngModelChange)="settings.settingChanged.next({prop:'showdata',data:settings.showdata})">data</mat-checkbox> -->
-    <!-- <mat-checkbox [(ngModel)]="settings.showVariations" (ngModelChange)="settings.settingChanged.next({prop:'showVariations',data:settings.showVariations})">variations</mat-checkbox> -->
+    <button mat-icon-button (click)="OpenSettings()">
+        <mat-icon>settings</mat-icon>
+    </button>
+    <mat-checkbox *ngFor="let s of settings.headers('recipes', true)" [(ngModel)]="s.enable" (change)="TableColumns()">
+        {{s.name}}
+    </mat-checkbox>
 </mat-toolbar>
 <mat-form-field>
     <input matInput [(ngModel)]="page" type="number" (change)="Filter()">
@@ -34,41 +35,36 @@
 
 
 
-<table mat-table [dataSource]="showingData" matSort (matSortChange)="ReSort($event)" matSortActive="name"
+<mat-table [dataSource]="showingData" matSort (matSortChange)="ReSort($event)" matSortActive="name"
     matSortDirection="asc">
     <ng-container *ngFor="let c of colDataSimple" [matColumnDef]="c.id">
-        <th [class]="['h_'+c.id]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>{{c.header}}</th>
-        <td mat-cell *matCellDef="let element"> {{c.data(element)}} </td>
+        <mat-header-cell [class]="['h_'+c.id]" *matHeaderCellDef mat-sort-header disableClear>{{c.header}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{c.data(element)}} </mat-cell>
     </ng-container>
 
     <ng-container [matColumnDef]="colData.check.id">
-        <th class="h_checked" mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let element" (click)="colData.check.checked(element)">
+        <mat-header-cell class="h check" *matHeaderCellDef></mat-header-cell>
+        <mat-cell class="c check" *matCellDef="let element" (click)="colData.check.checked(element)">
             <button mat-icon-button>
                 <mat-icon>{{colData.check.icon(element)}}</mat-icon>
             </button>
-        </td>
+        </mat-cell>
     </ng-container>
     <ng-container [matColumnDef]="colData.image.id">
-        <th class="h_image" mat-header-cell *matHeaderCellDef>がぞう</th>
-        <td mat-cell *matCellDef="let element">
+        <mat-header-cell class="h_image" *matHeaderCellDef>がぞう</mat-header-cell>
+        <mat-cell *matCellDef="let element">
             <div class="image">
                 <div *ngFor="let s of colData.image.data(element)">
                     <div class="image-name">{{s.name}}</div>
                     <img [src]="s.src" [id]="s.name">
                 </div>
             </div>
-        </td>
+        </mat-cell>
     </ng-container>
-    <!-- <ng-container [matColumnDef]="colData.var.id">
-        <th class="h_var" mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let element">
-            <mat-icon *ngIf="colData.var.exist(element)">edit</mat-icon>
-        </td>
-    </ng-container> -->
     <ng-container [matColumnDef]="colData.source.id">
-        <th class="h_source" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>入手手段</th>
-        <td class="d_source" mat-cell *matCellDef="let element">
+        <mat-header-cell class="h_source" *matHeaderCellDef mat-sort-header disableClear>入手手段</mat-header-cell>
+        <mat-cell class="d_source" *matCellDef="let element">
             <div>
                 <div>
                     <div *ngFor="let s of element.source;let i = index">{{t.ItemsSource(s)}}<ng-container
@@ -80,18 +76,8 @@
                 </button>
                 <mat-menu #menu="matMenu">{{element.sourceNotes}}</mat-menu>
             </div>
-        </td>
+        </mat-cell>
     </ng-container>
-    <!-- <ng-container [matColumnDef]="colData.variations.id">
-        <th class="h_variations" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>バリエーション</th>
-        <td class="d_variations" mat-cell *matCellDef="let element">
-            <div>
-                <div *ngFor="let s of element.variations;let i = index">{{colData.variations.ja(s)}}<ng-container
-                        *ngIf="IsNotLast(i, element.variations)"> , </ng-container>
-                </div>
-            </div>
-        </td>
-    </ng-container> -->
-    <tr mat-header-row *matHeaderRowDef="col"></tr>
-    <tr mat-row *matRowDef="let row; columns: col;"></tr>
-</table>
+    <mat-header-row *matHeaderRowDef="col"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: col;"></mat-row>
+</mat-table>

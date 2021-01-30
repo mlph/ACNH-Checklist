@@ -7,11 +7,11 @@ import { TranslationService } from 'src/app/services/translation.service';
 
 import { NihongoService } from 'src/app/services/nihongo.service';
 @Component({
-  selector: 'app-table',
-  templateUrl: './table.component.html',
-  styleUrls: ['./table.component.scss']
+  selector: 'app-item',
+  templateUrl: './item.component.html',
+  styleUrls: ['./item.component.scss']
 })
-export class TableComponent implements OnInit {
+export class ItemComponent implements OnInit {
 
 
   raw = this.data.data;
@@ -44,7 +44,7 @@ export class TableComponent implements OnInit {
       sort: true
     },
     {
-      id: "raw",
+      id: "rawdata",
       header: "データ",
       data: (i: ItemJ) => JSON.stringify(i, undefined, 2),
       sort: false
@@ -80,7 +80,7 @@ export class TableComponent implements OnInit {
       id: "source"
     },
     variations: {
-      id: "variations",
+      id: "variants",
       ja: (v: VariationElement) => v.variantTranslations?.japanese || "" + v.patternTranslations?.japanese || "",
       isChecked: (i: ItemJ, v: VariationElement) => i.checked.variants.find(va => va.variantId === variantId(v))?.checked || false,
       check: (i: ItemJ, v: VariationElement) => {
@@ -170,24 +170,17 @@ export class TableComponent implements OnInit {
 
   ngOnInit(): void {
     this.Filter();
-    this.settings.settingChanged.subscribe(v => {
+    this.settings.headerChanged.subscribe(v => {
       this.TableColumns();
     });
     this.TableColumns();
   }
 
   TableColumns() {
-    this.col = [this.colData.check.id, "name", this.colData.var.id, this.colData.image.id, "source", "catalog", this.colData.variations.id, "raw"];
-    // console.log(this.settings.items)
-    if (!this.settings.items.image) {
-      this.col = this.col.filter(v => v !== this.colData.image.id);
-    }
-    if (!this.settings.items.data) {
-      this.col = this.col.filter(v => v !== "raw");
-    }
-    if (!this.settings.items.variants) {
-      this.col = this.col.filter(v => v !== this.colData.variations.id);
-    }
+    this.col = this.settings.headers("items").filter(i => i.enable).map(i => i.key);
+  }
+  OpenSettings() {
+    this.settings.open(this.settings.headers("items"));
   }
 
 
@@ -292,15 +285,6 @@ export class TableComponent implements OnInit {
     current.state = states[(i + 1) % states.length];
     this.Filter();
   }
+
+
 };
-
-
-
-
-const firstOrUndefined = <T>(a: Array<T> | null | undefined) => {
-  if (a) {
-    return a[0];
-  }
-  return undefined;
-};
-

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { npcs, seasonsAndEvents, translations } from 'animal-crossing';
+import { CreatureSourceSheet, LightingType, Weather } from 'animal-crossing/lib/types/Creature';
 import { Catalog, Category } from 'animal-crossing/lib/types/Item';
 import { Type } from 'animal-crossing/lib/types/SeasonsAndEvents';
 import { Personality } from 'animal-crossing/lib/types/Villager';
@@ -127,7 +128,7 @@ export class TranslationService {
     }
     const c: Record<string, string> = {
       "Halloween": "ハロウィン", "Toy Day": "クリスマスイブ", "Wedding Season": "ジューンブライド",
-      "ornaments": "オーナメント", "mushrooms": "キノコ", "acorns and pine cones": "きのみ","Nature day":"アースデー"
+      "ornaments": "オーナメント", "mushrooms": "キノコ", "acorns and pine cones": "きのみ", "Nature day": "アースデー"
     };
     return s.split("; ").map(ss => {
       if (ss.includes("ready days") || ss.includes("shopping days")) {
@@ -138,8 +139,8 @@ export class TranslationService {
       }
       const se = seasonsAndEvents.find(e => e.name === ss);
       if (se) {
-        if(se.type === Type.ZodiacSeason){
-          return se.translations?.japanese + "ざ"
+        if (se.type === Type.ZodiacSeason) {
+          return se.translations?.japanese + "ざ";
         }
         return se.translations?.japanese || no(ss);
       }
@@ -191,6 +192,14 @@ export class TranslationService {
     }
   }
 
+  CreatureSourceSheet(s: CreatureSourceSheet) {
+    switch (s) {
+      case CreatureSourceSheet.Fish: return "サカナ";
+      case CreatureSourceSheet.Insects: return "ムシ";
+      case CreatureSourceSheet.SeaCreatures: return "うみのさち";
+    }
+  }
+
   Personarity(p: Personality) {
     switch (p) {
       case Personality.Lazy: return "ぼんやり";
@@ -204,6 +213,35 @@ export class TranslationService {
     }
   }
 
+  weather(w?: Weather) {
+    switch (w) {
+      case Weather.AnyWeather: return "いつでも";
+      case Weather.RainOnly: return "雨";
+      case Weather.AnyExceptRain: return "雨以外";
+    }
+    return no();
+  }
+
+  wherehow(w?: string) {
+    if (!w) { return no(); }
+    const c: Record<string, string> = {
+      "On trees (any kind)": "木", "On palm trees": "ヤシの木", "On hardwood/cedar trees": "広葉樹/針葉樹",
+      "Shaking trees": "木を揺する", "Shaking trees (hardwood or cedar only)": "広葉樹/針葉樹を揺する",
+      "From hitting rocks": "岩を叩く",
+      "On the ground": "地面", "On tree stumps": "切り株", "On rivers/ponds": "川/池", "On rocks/bushes": "岩/低木", "On beach rocks": "海岸の岩肌",
+      "Flying": "飛んでいる", "Flying near flowers": "花の近くを飛んでいる", "Flying near water": "水辺に飛んでいる",
+      "Flying near light sources": "光源の近くを飛んでいる", "Flying near blue/purple/black flowers": "青/紫/黒の花",
+      "Flying near trash (boots, tires, cans, used fountain fireworks) or rotten turnips": "ゴミの近くを飛んでいる",
+      "On flowers": "花の上", "On white flowers": "白い花の上", "Underground (dig where noise is loudest)": "鳴き声のする場所を掘る",
+      "Pushing snowballs": "雪玉を押している", "On villagers": "村人", "On rotten turnips or candy": "くさったカブかアメの上",
+      "Disguised under trees": "木の下で擬態している", "Disguised on shoreline": "砂浜で擬態している",
+
+      "River": "川", "Pond": "池", "River (clifftop)": "崖の上", "River (mouth)": "河口",
+      "Sea": "海", "Sea (rainy days)": "海(雨の日)", "Pier": "桟橋",
+    };
+
+    return c[w] || no(w);
+  }
 }
 
 

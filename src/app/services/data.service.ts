@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { items, npcs, recipes, translations, construction, IRecipe, villagers, seasonsAndEvents } from "animal-crossing";
+import { items, recipes, IRecipe, creatures, ICreature, translations } from "animal-crossing";
 import { Category, Item, VariationElement } from 'animal-crossing/lib/types/Item';
 import { TranslationService } from './translation.service';
 
@@ -19,6 +19,7 @@ export class DataService {
   data!: ItemJ[];
   categories: { key: Category, name: string; }[] = [];
   recipe!: IRecipeJ[];
+  creature!: ICreatureJ[];
 
 
   constructor(
@@ -32,7 +33,7 @@ export class DataService {
   }
 
   Init() {
-    const Process = (i: Item) => {
+    const Process_Item = (i: Item) => {
       const r = i as ItemJ;
       r.nameJ = i.translations?.japanese || i.name;
       if (!i.translations || !i.translations.japanese) {
@@ -75,17 +76,24 @@ export class DataService {
 
       return r;
     };
-    const Process2 = (i: IRecipe) => {
+    const Process_Recipe = (i: IRecipe) => {
       const r = i as IRecipeJ;
       r.nameJ = i.translations?.japanese || i.name;
       r.nameH = this.nihongo.toHiragana(r.nameJ);
       r.checked = !!this.settings.checklist.recipes[r.internalId];
       return r;
     };
+    const Process_Creature = (i: ICreature) => {
+      const r = i as ICreatureJ;
+      r.nameJ = i.translations.japanese;
+      r.nameH = this.nihongo.toHiragana(r.nameJ);
+      r.checked = !!this.settings.checklist.recipes[r.internalId];
+      return r;
+    };
 
-    this.data = items.map(v => Process(v));
-
-    this.recipe = recipes.map(Process2);
+    this.data = items.map(v => Process_Item(v));
+    this.recipe = recipes.map(Process_Recipe);
+    this.creature = creatures.map(Process_Creature);
   }
 
   test() {
@@ -97,19 +105,22 @@ export class DataService {
     // console.log(wall.length);
     // const a = items.filter(v=>!v.source)
     // console.log(a)
-    // const a: string[] = [];
-    // for (const i of recipes) {
-    //   if (!i.source) {
-    //     continue;
-    //   }
-    //   for (const s of i.source) {
-    //     if (!a.includes(s)) {
-    //       a.push(s);
-    //     }
-    //   }
-    // }
+    const a: string[] = [];
+    for (const i of creatures) {
+      // if (!i.source) {
+      //   continue;
+      // }
+      // for (const s of i.source) {
+      //   if (!a.includes(s)) {
+      //     a.push(s);
+      //   }
+      // }
+      if(i.whereHow && !a.includes(i.whereHow)){
+        a.push(i.whereHow)
+      }
+    }
     // console.log(a.filter(v => this.t.ItemsSource(v).startsWith("no")));
-    // console.log(a);
+    console.log(a);
     // const a = ["Furniture", "Accessories", "Tops Variants", "Furniture Patterns", "Furniture Variants", "Dresses Variants", "Dinosaurs", "Bottoms Variants", "Caps Variants", "Shoes Variants", "Constellations", "Craft", "Caps", "Socks", "Bugs", "Accessories Variants", "Bags Variants", "Socks Variants", "Tops", "Villagers", "Pictures", "Posters", "K.K. Albums", "Reactions", "Masks Variants", "ETC", "Rugs", "Marine Suit Variants", "Special NPCs", "Dresses", "Events", "HHA Themes", "Bags", "Fence", "Floors", "Walls", "Tools", "Doorplates", "Shoes", "Umbrella", "Masks", "Sea Creatures", "Villagers Catch Phrase", "Bottoms", "Bugs Models", "Fish", "Fish Models", "Marine Suit", "Event Items", "Fossils", "Art", "HHA Set", "Plants", "House Roof", "House Door", "HHA Situation", "House Wall", "House Mailbox", "Bridge & Inclines", "Fashion Themes", "Shells"]
 
     // a.forEach(s=>console.log(translations.find(t=>t.sourceSheet === s)))
@@ -117,6 +128,8 @@ export class DataService {
     // console.log(seasonsAndEvents);
     // console.log(items.filter(i => !i.internalId && !i.translations?.id));
     // console.log(recipes.filter(i => !i.internalId ));
+    // console.log(creatures.length, creatures[0]);
+    // console.log(creatures.filter(c=>typeof c.hemispheres.north.timeArray[0] !== "number"))
   }
 
 
@@ -156,5 +169,13 @@ export type IRecipeJ = IRecipe & {
   nameH: string;
   checked: boolean;
 };
+export type ICreatureJ = ICreature & {
+  nameJ: string;
+  nameH: string;
+  checked: boolean;
+  // discriptionJ: string;
+  // catchPhraseJ: string;
+};
+
 
 export const variantId = (v: VariationElement) => v.variantId || v.variation?.toString() || "undefined";

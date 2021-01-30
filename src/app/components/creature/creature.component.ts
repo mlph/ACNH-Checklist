@@ -1,107 +1,132 @@
 import { Component, OnInit } from '@angular/core';
 import { Sort } from '@angular/material/sort';
-import { Category } from 'animal-crossing/lib/types/Recipe';
-import { DataService, IRecipeJ } from 'src/app/services/data.service';
+import { CreatureSourceSheet } from 'animal-crossing/lib/types/Creature';
+import { DataService, ICreatureJ } from 'src/app/services/data.service';
 import { NihongoService } from 'src/app/services/nihongo.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { TranslationService } from 'src/app/services/translation.service';
 
 @Component({
-  selector: 'app-recipe',
-  templateUrl: './recipe.component.html',
-  styleUrls: ['./recipe.component.scss']
+  selector: 'app-creature',
+  templateUrl: './creature.component.html',
+  styleUrls: ['./creature.component.scss']
 })
-export class RecipeComponent implements OnInit {
+export class CreatureComponent implements OnInit {
 
-  raw = this.data.recipe;
+  raw = this.data.creature;
 
-  filteredData: IRecipeJ[] = [];
-  showingData: IRecipeJ[] = [];
+  filteredData: ICreatureJ[] = [];
+  showingData: ICreatureJ[] = [];
 
   page = 1;
   row = 100;
 
-  eventstate = ["全て", "季節/イベント限定のみ", "季節/イベント限定を除く"];
-  event = { state: this.eventstate[0] };
-
 
   search = "";
   private _search = "";
-  col = ["name", "image", "source"];
+  col = ["name", "source", "catalog"];
 
   colDataSimple = [
     {
       id: "name",
       header: "なまえ",
-      data: (i: IRecipeJ) => i.nameJ
+      data: (i: ICreatureJ) => i.nameJ,
+      key: "nameJ",
+      sort: true
     },
-    // {
-    //   id: "catalog",
-    //   header: "カタログ",
-    //   data: (i: ItemJ) => this.t.Catalog(i.catalog)
-    // },
+    {
+      id: "id",
+      header: "Id",
+      data: (i: ICreatureJ) => i.num,
+      key: "num",
+      sort: true
+    },
     {
       id: "rawdata",
-      header: "データ",
-      data: (i: any) => JSON.stringify(i, undefined, 2)
+      header: "json",
+      data: (i: ICreatureJ) => JSON.stringify(i, undefined, 2),
+      sort: false
+    },
+  ];
+
+  colDataImage = [
+    {
+      id: "imgIcon",
+      header: "アイコン",
+      key: "iconImage"
     },
     {
-      id: "event",
-      header: "イベント",
-      data: (i: IRecipeJ) => this.t.SeasonsAndEvents(i.seasonEvent)
-    }
+      id: "imgPedia",
+      header: "ずかん",
+      key: "critterpediaImage"
+    },
+    {
+      id: "imgFurniture",
+      header: "かぐ",
+      key: "furnitureImage"
+    },
   ];
 
   colData = {
-    image: {
-      id: "image",
-      data: (i: IRecipeJ): { src: string, name?: string; }[] => {
-        const result: { src: string, name?: string; }[] = [];
-        [i.image].forEach(v => {
-          if (v) {
-            result.push({ src: v });
-          }
-        });
-        return result;
-      },
-    },
-    source: {
-      id: "source"
-    },
-    // variations: {
-    //   id: "variations",
-    //   ja: (v: VariationElement) => v.variantTranslations?.japanese || v.patternTranslations?.japanese
-    // },
-    // var: {
-    //   id: "var",
-    //   exist: (i: ItemJ) => !!i.variations
-    // }
     check: {
       id: "check",
-      icon: (i: IRecipeJ) => {
+      icon: (i: ICreatureJ) => {
         switch (i.checked) {
           case true: return "check_box";
           case false: return "check_box_outline_blank";
         }
       },
-      checked: (i: IRecipeJ) => {
+      checked: (i: ICreatureJ) => {
         i.checked = !i.checked;
         this.settings.checklist.recipes[i.internalId] = i.checked;
       }
-    }
+    },
+    period: {
+      id: "period",
+      // "hemispheres.north.monthsArray": "",
+      // ".hemispheres.north.time": ""
+      time: (i: ICreatureJ) => {
+        const t = i.hemispheres.north.timeArray;
+        if (typeof i.hemispheres.north.timeArray[0] === "number") {
+          return t as Array<number>;
+        } else {
+          return ([] as number[]).concat(...(t as number[][]));
+        }
+      }
+    },
+    property: {
+      id: "property",
+      header: "データ",
+      data: (i: ICreatureJ) => {
+        switch (i.sourceSheet) {
+          case CreatureSourceSheet.Insects: return [
+            { key: "天気", value: this.t.weather(i.weather) },
+            { key: "場所", value: this.t.wherehow(i.whereHow) },
+          ];
+          case CreatureSourceSheet.Fish: return [
+            { key: "影", value: i.shadow },
+            { key: "視界", value: i.vision },
+            { key: "場所", value: this.t.wherehow(i.whereHow) },
+          ];
+          case CreatureSourceSheet.SeaCreatures: return [
+            { key: "移動速度", value: i.movementSpeed },
+            { key: "影", value: i.shadow },
+          ];
+        }
+      },
+      // key:
+      sort: false
+    },
   };
 
+  _12 = [...Array(12).keys()].map(v => v + 1);
+  _24 = [...Array(24).keys()].map(v => v);
+
   categories = [
-    Category.Housewares,
-    Category.Miscellaneous,
-    Category.WallMounted,
-    Category.Wallpaper,
-    Category.Rugs,
-    Category.Floors,
-    Category.Equipment,
-    Category.Other,
-    Category.Tools,
-  ].map(v => ({ key: v, name: this.t.Category(v), checked: false }));
+    CreatureSourceSheet.Insects,
+    CreatureSourceSheet.Fish,
+    CreatureSourceSheet.SeaCreatures,
+  ].map(v => ({ key: v, name: this.t.CreatureSourceSheet(v), checked: false }));
 
 
   constructor(
@@ -120,10 +145,10 @@ export class RecipeComponent implements OnInit {
   }
 
   TableColumns() {
-    this.col = this.settings.headers("recipes").filter(i => i.enable).map(i => i.key);
+    this.col = this.settings.headers("creatures").filter(i => i.enable).map(i => i.key);
   }
   OpenSettings() {
-    this.settings.open(this.settings.headers("recipes"));
+    this.settings.open(this.settings.headers("creatures"));
   }
 
 
@@ -154,21 +179,14 @@ export class RecipeComponent implements OnInit {
     // console.log(this._search);
 
     this.filteredData = this.raw
-      .filter(d => this.categories.find(c => c.key === d.category)?.checked)
+      .filter(d => this.categories.find(c => c.key === d.sourceSheet)?.checked)
       .filter(this.SearchWord)
-      .filter(d => {
-        switch (this.event.state) {
-          case (this.eventstate[1]): return d.seasonEventExclusive;
-          case (this.eventstate[2]): return !d.seasonEventExclusive;
-          default: return true;
-        }
-      })
       .sort((a, b) => {
         const isAsc = this.lastSort.direction === 'asc';
         switch (this.lastSort.active) {
           case 'name': return compare(a.nameJ, b.nameJ, isAsc);
-          case 'source': return compare_ItemSource(a.source, b.source, isAsc);
-          case 'event': return compare(this.t.SeasonsAndEvents(a.seasonEvent), this.t.SeasonsAndEvents(b.seasonEvent), isAsc);
+          case 'id': return compare(a.num, b.num, isAsc);
+          // case 'source': return compare_ItemSource(a.source, b.source, isAsc);
           default: return 0;
         }
       });
@@ -183,7 +201,7 @@ export class RecipeComponent implements OnInit {
 
   }
 
-  private lastSort: Sort = { active: "name", direction: "asc" };
+  private lastSort: Sort = { active: "id", direction: "asc" };
   ReSort(sort: Sort) {
     // console.log(sort);
     this.lastSort = sort;
@@ -204,7 +222,7 @@ export class RecipeComponent implements OnInit {
     this.Filter();
   }
 
-  SearchWord = (d: IRecipeJ) => {
+  SearchWord = (d: ICreatureJ) => {
     if (!this.search) {
       return true;
     }
@@ -227,5 +245,6 @@ export class RecipeComponent implements OnInit {
     current.state = states[(i + 1) % states.length];
     this.Filter();
   }
+
 
 }
