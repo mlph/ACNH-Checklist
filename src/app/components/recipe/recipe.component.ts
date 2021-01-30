@@ -49,7 +49,13 @@ export class RecipeComponent implements OnInit {
       id: "event",
       header: "イベント",
       data: (i: IRecipeJ) => this.t.SeasonsAndEvents(i.seasonEvent)
-    }
+    },
+    {
+      id: "series",
+      header: "シリーズ",
+      data: (i: IRecipeJ) => this.data.series(i.name),
+      sort: true
+    },
   ];
 
   colData = {
@@ -88,6 +94,10 @@ export class RecipeComponent implements OnInit {
         i.checked = !i.checked;
         this.settings.checklist.recipes[i.internalId] = i.checked;
       }
+    },
+    material: {
+      id: "material",
+      mats: (i: IRecipeJ) => Object.keys(i.materials).map(m => ({ name: this.t.all(m), count: i.materials[m], image: this.data.image(m) }))
     }
   };
 
@@ -167,12 +177,15 @@ export class RecipeComponent implements OnInit {
         const isAsc = this.lastSort.direction === 'asc';
         switch (this.lastSort.active) {
           case 'name': return compare(a.nameJ, b.nameJ, isAsc);
+          case 'series': return compare(this.data.series(a.name), this.data.series(b.name), isAsc);
           case 'source': return compare_ItemSource(a.source, b.source, isAsc);
           case 'event': return compare(this.t.SeasonsAndEvents(a.seasonEvent), this.t.SeasonsAndEvents(b.seasonEvent), isAsc);
           default: return 0;
         }
       });
-
+    if (this.page < 1) {
+      this.page = 1;
+    }
     if (this.filteredData.length <= (this.page - 1) * this.row) {
       this.page = 1;
     }

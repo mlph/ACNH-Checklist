@@ -84,9 +84,17 @@
         <mat-header-cell class="h_source" *matHeaderCellDef mat-sort-header disableClear>入手手段</mat-header-cell>
         <mat-cell class="d_source" *matCellDef="let element">
             <div>
-                <div>
-                    <div *ngFor="let s of element.source;let i = index">{{t.ItemsSource(s)}}<ng-container
-                            *ngIf="IsNotLast(i, element.source)"> , </ng-container>
+                <div class="list">
+                    <div *ngFor="let s of element.source;let i = index">{{t.ItemsSource(s)}}
+                        <!-- <button mat-icon-button *ngIf="element.diy" [matMenuTriggerFor]="recipe">
+                            <mat-icon>speaker_notes</mat-icon>
+                            <mat-menu #recipe="matMenu">{{t.ItemsSource(element.recipe.source)}}</mat-menu>
+                        </button> -->
+                        <span *ngIf="s === 'Crafting'" class="recipe">
+                            <ng-container *ngFor="let s of element.recipe.source">
+                                {{t.ItemsSource(s)}}
+                            </ng-container>
+                        </span>
                     </div>
                 </div>
                 <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="element.sourceNotes">
@@ -128,6 +136,16 @@
             </button>
         </mat-cell>
     </ng-container>
+    <ng-container [matColumnDef]="colData.material.id">
+        <mat-header-cell class="h material" *matHeaderCellDef>材料</mat-header-cell>
+        <mat-cell class="d material" *matCellDef="let element">
+            <div *ngFor="let s of colData.material.mats(element)">
+                <div>{{s.count}}</div>
+                <div><img *ngIf="settings.generals.materialImage" [src]="s.image">{{s.name}}</div>
+            </div>
+        </mat-cell>
+    </ng-container>
+
     <mat-header-row *matHeaderRowDef="col"></mat-header-row>
     <mat-row *matRowDef="let row; columns: col;"></mat-row>
 </mat-table>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { items, recipes, IRecipe, creatures, ICreature, translations } from "animal-crossing";
-import { Category, Item, VariationElement } from 'animal-crossing/lib/types/Item';
+import { Category, Item, VariationElement, Version } from 'animal-crossing/lib/types/Item';
 import { TranslationService } from './translation.service';
 
 import { NihongoService } from './nihongo.service';
@@ -105,22 +105,22 @@ export class DataService {
     // console.log(wall.length);
     // const a = items.filter(v=>!v.source)
     // console.log(a)
-    const a: string[] = [];
-    for (const i of creatures) {
-      // if (!i.source) {
-      //   continue;
-      // }
-      // for (const s of i.source) {
-      //   if (!a.includes(s)) {
-      //     a.push(s);
-      //   }
-      // }
-      if(i.whereHow && !a.includes(i.whereHow)){
-        a.push(i.whereHow)
-      }
-    }
-    // console.log(a.filter(v => this.t.ItemsSource(v).startsWith("no")));
-    console.log(a);
+    // const a: string[] = [];
+    // for (const i of creatures) {
+    //   // if (!i.source) {
+    //   //   continue;
+    //   // }
+    //   // for (const s of i.source) {
+    //   //   if (!a.includes(s)) {
+    //   //     a.push(s);
+    //   //   }
+    //   // }
+    //   if(i.whereHow && !a.includes(i.whereHow)){
+    //     a.push(i.whereHow)
+    //   }
+    // }
+    // // console.log(a.filter(v => this.t.ItemsSource(v).startsWith("no")));
+    // console.log(a);
     // const a = ["Furniture", "Accessories", "Tops Variants", "Furniture Patterns", "Furniture Variants", "Dresses Variants", "Dinosaurs", "Bottoms Variants", "Caps Variants", "Shoes Variants", "Constellations", "Craft", "Caps", "Socks", "Bugs", "Accessories Variants", "Bags Variants", "Socks Variants", "Tops", "Villagers", "Pictures", "Posters", "K.K. Albums", "Reactions", "Masks Variants", "ETC", "Rugs", "Marine Suit Variants", "Special NPCs", "Dresses", "Events", "HHA Themes", "Bags", "Fence", "Floors", "Walls", "Tools", "Doorplates", "Shoes", "Umbrella", "Masks", "Sea Creatures", "Villagers Catch Phrase", "Bottoms", "Bugs Models", "Fish", "Fish Models", "Marine Suit", "Event Items", "Fossils", "Art", "HHA Set", "Plants", "House Roof", "House Door", "HHA Situation", "House Wall", "House Mailbox", "Bridge & Inclines", "Fashion Themes", "Shells"]
 
     // a.forEach(s=>console.log(translations.find(t=>t.sourceSheet === s)))
@@ -130,6 +130,7 @@ export class DataService {
     // console.log(recipes.filter(i => !i.internalId ));
     // console.log(creatures.length, creatures[0]);
     // console.log(creatures.filter(c=>typeof c.hemispheres.north.timeArray[0] !== "number"))
+    // console.log(items.filter(i=>i.versionAdded === Version.The170))
   }
 
 
@@ -149,6 +150,14 @@ export class DataService {
       }
     }
     return result;
+  }
+
+  image(s: string) {
+    return items.find(i => i.name === s)?.inventoryImage || "";
+  }
+
+  series(s: string) {
+    return items.find(i => i.name === s)?.seriesTranslations?.japanese || "";
   }
 }
 

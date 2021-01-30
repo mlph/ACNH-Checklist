@@ -13,6 +13,10 @@ export class TranslationService {
   constructor() { }
 
 
+  all(s: string) {
+    return translations.find(v => v.english === s)?.japanese || no(s);
+  }
+
   ItemsSource(source?: string | null) {
     if (!source) {
       return no(source);
@@ -128,7 +132,7 @@ export class TranslationService {
     }
     const c: Record<string, string> = {
       "Halloween": "ハロウィン", "Toy Day": "クリスマスイブ", "Wedding Season": "ジューンブライド",
-      "ornaments": "オーナメント", "mushrooms": "キノコ", "acorns and pine cones": "きのみ", "Nature day": "アースデー"
+      "ornaments": "オーナメント", "mushrooms": "キノコ", "acorns and pine cones": "きのみ", "Nature Day": "アースデー"
     };
     return s.split("; ").map(ss => {
       if (ss.includes("ready days") || ss.includes("shopping days")) {

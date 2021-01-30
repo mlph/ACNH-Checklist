@@ -54,6 +54,12 @@ export class ItemComponent implements OnInit {
       header: "",
       data: (i: ItemJ) => i.variations?.length || "",
       sort: false
+    },
+    {
+      id: "series",
+      header: "シリーズ",
+      data: (i: ItemJ) => i.seriesTranslations?.japanese || i.series || "",
+      sort: true
     }
   ];
 
@@ -81,7 +87,7 @@ export class ItemComponent implements OnInit {
     },
     variations: {
       id: "variants",
-      ja: (v: VariationElement) => v.variantTranslations?.japanese || "" + v.patternTranslations?.japanese || "",
+      ja: (v: VariationElement) => (v.variantTranslations?.japanese || "") + (v.patternTranslations?.japanese || ""),
       isChecked: (i: ItemJ, v: VariationElement) => i.checked.variants.find(va => va.variantId === variantId(v))?.checked || false,
       check: (i: ItemJ, v: VariationElement) => {
         const vari = i.checked.variants.find(va => va.variantId === variantId(v));
@@ -121,6 +127,10 @@ export class ItemComponent implements OnInit {
         this.settings.checklist.items[i.internalId] = i.checked;
       },
       isChecked: (i: ItemJ) => i.checked.base === "true"
+    },
+    material: {
+      id: "material",
+      mats: (i: ItemJ) => Object.keys(i.recipe?.materials || []).map(m => ({ name: this.t.all(m), count: i.recipe?.materials[m], image: this.data.image(m) }))
     }
   };
 
@@ -225,6 +235,7 @@ export class ItemComponent implements OnInit {
         const isAsc = this.lastSort.direction === 'asc';
         switch (this.lastSort.active) {
           case 'name': return compare(a.nameJ, b.nameJ, isAsc);
+          case 'series': return compare(a.seriesTranslations?.japanese, b.seriesTranslations?.japanese, isAsc);
           case 'source': return compare_ItemSource(a.source, b.source, isAsc);
           case 'catalog': return compare(a.catalog, b.catalog, isAsc);
           default: return 0;

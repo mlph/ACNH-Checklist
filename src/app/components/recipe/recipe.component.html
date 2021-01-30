@@ -1,83 +1,111 @@
 <mat-toolbar>
-    <button mat-icon-button (click)="OpenSettings()">
-        <mat-icon>settings</mat-icon>
-    </button>
-    <mat-checkbox *ngFor="let s of settings.headers('recipes', true)" [(ngModel)]="s.enable" (change)="TableColumns()">
-        {{s.name}}
-    </mat-checkbox>
-</mat-toolbar>
-<mat-form-field>
-    <input matInput [(ngModel)]="page" type="number" (change)="Filter()">
-</mat-form-field>
-<mat-form-field>
-    <input matInput [(ngModel)]="row" type="number" (change)="Filter()">
-</mat-form-field>
-<button mat-button (click)="ToggleState(eventstate, event)">{{event.state}}</button>
-
-{{(page - 1) * row + 1}} - {{(page - 1) * row + showingData.length}} / {{filteredData.length}} / {{raw.length}}
-
-<div>
-    <mat-form-field>
-        <input matInput [(ngModel)]="search" (change)="Filter()">
-        <button mat-icon-button matSuffix (click)="search = '';Filter()">
-            <mat-icon>close</mat-icon>
+    <mat-toolbar-row class="main">
+        <button mat-icon-button (click)="OpenSettings()">
+            <mat-icon>settings</mat-icon>
         </button>
-    </mat-form-field>
-</div>
+        <mat-checkbox *ngFor="let s of settings.headers('recipes', true)" [(ngModel)]="s.enable"
+            (change)="TableColumns()">
+            {{s.name}}
+        </mat-checkbox>
+        <div class="space"></div>
+        <div class="pages">
+            {{(page - 1) * row + 1}} - {{(page - 1) * row + showingData.length}} / {{filteredData.length}} /
+            {{raw.length}}
+        </div>
+        <div>
+            <mat-form-field class="page">
+                <input matInput [(ngModel)]="page" type="number" min="1" (change)="Filter()">
+            </mat-form-field>
+            <span class="suffix">page</span>
+        </div>
+        <div>
+            <mat-form-field class="row">
+                <input matInput [(ngModel)]="row" type="number" min="1" (change)="Filter()">
+            </mat-form-field>
+            <span class="suffix">items per row</span>
+        </div>
+    </mat-toolbar-row>
+    <mat-toolbar-row class="sub">
+        <div>
+            <mat-form-field>
+                <input matInput [(ngModel)]="search" (change)="Filter()">
+                <button mat-icon-button matSuffix (click)="search = '';Filter()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </mat-form-field>
+        </div>
+        <button mat-button (click)="ToggleState(eventstate, event)">{{event.state}}</button>
+    </mat-toolbar-row>
+</mat-toolbar>
 
-<div>
-    <button mat-icon-button (click)="CategoryAll(categories)">
-        <mat-icon>weekend</mat-icon>
-    </button>
-    <button mat-raised-button *ngFor="let c of categories" (click)="CategoryButton(c)"
-        [class.active]="c.checked">{{c.name}}</button>
-</div>
+<div class="content">
+
+    <div>
+        <button mat-icon-button (click)="CategoryAll(categories)">
+            <mat-icon>article</mat-icon>
+        </button>
+        <button mat-raised-button *ngFor="let c of categories" (click)="CategoryButton(c)"
+            [class.active]="c.checked">{{c.name}}</button>
+    </div>
 
 
 
-<mat-table [dataSource]="showingData" matSort (matSortChange)="ReSort($event)" matSortActive="name"
-    matSortDirection="asc">
-    <ng-container *ngFor="let c of colDataSimple" [matColumnDef]="c.id">
-        <mat-header-cell [class]="['h_'+c.id]" *matHeaderCellDef mat-sort-header disableClear>{{c.header}}
-        </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{c.data(element)}} </mat-cell>
-    </ng-container>
+    <mat-table [dataSource]="showingData" matSort (matSortChange)="ReSort($event)" matSortActive="name"
+        matSortDirection="asc">
+        <ng-container *ngFor="let c of colDataSimple" [matColumnDef]="c.id">
+            <mat-header-cell [class]="['h_'+c.id]" *matHeaderCellDef mat-sort-header disableClear>{{c.header}}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{c.data(element)}} </mat-cell>
+        </ng-container>
 
-    <ng-container [matColumnDef]="colData.check.id">
-        <mat-header-cell class="h check" *matHeaderCellDef></mat-header-cell>
-        <mat-cell class="c check" *matCellDef="let element" (click)="colData.check.checked(element)">
-            <button mat-icon-button>
-                <mat-icon>{{colData.check.icon(element)}}</mat-icon>
-            </button>
-        </mat-cell>
-    </ng-container>
-    <ng-container [matColumnDef]="colData.image.id">
-        <mat-header-cell class="h_image" *matHeaderCellDef>がぞう</mat-header-cell>
-        <mat-cell *matCellDef="let element">
-            <div class="image">
-                <div *ngFor="let s of colData.image.data(element)">
-                    <div class="image-name">{{s.name}}</div>
-                    <img [src]="s.src" [id]="s.name">
-                </div>
-            </div>
-        </mat-cell>
-    </ng-container>
-    <ng-container [matColumnDef]="colData.source.id">
-        <mat-header-cell class="h_source" *matHeaderCellDef mat-sort-header disableClear>入手手段</mat-header-cell>
-        <mat-cell class="d_source" *matCellDef="let element">
-            <div>
-                <div>
-                    <div *ngFor="let s of element.source;let i = index">{{t.ItemsSource(s)}}<ng-container
-                            *ngIf="IsNotLast(i, element.source)"> , </ng-container>
+        <ng-container [matColumnDef]="colData.check.id">
+            <mat-header-cell class="h check" *matHeaderCellDef></mat-header-cell>
+            <mat-cell class="c check" *matCellDef="let element" (click)="colData.check.checked(element)">
+                <button mat-icon-button>
+                    <mat-icon>{{colData.check.icon(element)}}</mat-icon>
+                </button>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="colData.image.id">
+            <mat-header-cell class="h_image" *matHeaderCellDef>がぞう</mat-header-cell>
+            <mat-cell *matCellDef="let element">
+                <div class="image">
+                    <div *ngFor="let s of colData.image.data(element)">
+                        <div class="image-name">{{s.name}}</div>
+                        <img [src]="s.src" [id]="s.name">
                     </div>
                 </div>
-                <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="element.sourceNotes">
-                    <mat-icon>speaker_notes</mat-icon>
-                </button>
-                <mat-menu #menu="matMenu">{{element.sourceNotes}}</mat-menu>
-            </div>
-        </mat-cell>
-    </ng-container>
-    <mat-header-row *matHeaderRowDef="col"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: col;"></mat-row>
-</mat-table>
+            </mat-cell>
+        </ng-container>
+        <ng-container [matColumnDef]="colData.source.id">
+            <mat-header-cell class="h_source" *matHeaderCellDef mat-sort-header disableClear>入手手段</mat-header-cell>
+            <mat-cell class="d_source" *matCellDef="let element">
+                <div>
+                    <div>
+                        <div *ngFor="let s of element.source;let i = index">{{t.ItemsSource(s)}}<ng-container
+                                *ngIf="IsNotLast(i, element.source)"> , </ng-container>
+                        </div>
+                    </div>
+                    <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="element.sourceNotes">
+                        <mat-icon>speaker_notes</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">{{element.sourceNotes}}</mat-menu>
+                </div>
+            </mat-cell>
+        </ng-container>
+
+        <ng-container [matColumnDef]="colData.material.id">
+            <mat-header-cell class="h material" *matHeaderCellDef>材料</mat-header-cell>
+            <mat-cell class="d material" *matCellDef="let element">
+                <div *ngFor="let s of colData.material.mats(element)">
+                    <div>{{s.count}}</div>
+                    <div><img *ngIf="settings.generals.materialImage" [src]="s.image">{{s.name}}</div>
+                </div>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="col"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: col;"></mat-row>
+    </mat-table>
+
+</div>

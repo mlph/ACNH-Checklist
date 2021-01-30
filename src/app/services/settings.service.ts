@@ -16,6 +16,8 @@ const headersDefault = {
     { name: "入手手段", key: "source", enable: true, toggleSwitch: false },
     { name: "カタログ", key: "catalog", enable: true, toggleSwitch: false },
     { name: "変種", key: "variants", enable: false, toggleSwitch: true },
+    { name: "シリーズ", key: "series", enable: false, toggleSwitch: true },
+    { name: "材料", key: "material", enable: false, toggleSwitch: true },
     { name: "元データ", key: "rawdata", enable: false, toggleSwitch: true }
   ],
   recipes: [
@@ -24,6 +26,8 @@ const headersDefault = {
     { name: "画像", key: "image", enable: false, toggleSwitch: true },
     { name: "入手手段", key: "source", enable: true, toggleSwitch: false },
     { name: "イベント", key: "event", enable: true, toggleSwitch: false },
+    // { name: "シリーズ", key: "series", enable: false, toggleSwitch: true },
+    { name: "材料", key: "material", enable: false, toggleSwitch: true },
     { name: "元データ", key: "rawdata", enable: false, toggleSwitch: true },
   ],
   creatures: [
@@ -55,6 +59,11 @@ export class SettingsService {
     recipes?: HeaderSetting[],
     creatures?: HeaderSetting[];
   } = {};
+
+  generals = {
+    materialImage: true,
+    materialKanji: false,
+  };
 
   checklist: {
     items: {
@@ -89,36 +98,6 @@ export class SettingsService {
     return (this._headers[key] as HeaderSetting[]).filter(_filter);
   }
 
-  // itemsHeaders(filter = false): HeaderSetting[] {
-  //   const _filter = filter ? (i: HeaderSetting) => i.toggleSwitch : () => true;
-  //   if (!this._items) {
-  //     this._items = [
-  //       { name: "チェック", key: "check", enable: true, toggleSwitch: false },
-  //       { name: "名前", key: "name", enable: true, toggleSwitch: false },
-  //       { name: "画像", key: "image", enable: false, toggleSwitch: true },
-  //       { name: "入手手段", key: "source", enable: true, toggleSwitch: false },
-  //       { name: "カタログ", key: "catalog", enable: true, toggleSwitch: false },
-  //       { name: "変種", key: "variants", enable: false, toggleSwitch: true },
-  //       { name: "元データ", key: "rawdata", enable: false, toggleSwitch: true }
-  //     ];
-  //   }
-  //   return this._items.filter(_filter);
-  // }
-
-  // recipesHeaders(filter = false): HeaderSetting[] {
-  //   const _filter = filter ? (i: HeaderSetting) => i.toggleSwitch : () => true;
-  //   if (!this._recipes) {
-  //     this._recipes = [
-  //       { name: "チェック", key: "check", enable: true, toggleSwitch: false },
-  //       { name: "名前", key: "name", enable: true, toggleSwitch: false },
-  //       { name: "画像", key: "image", enable: false, toggleSwitch: true },
-  //       { name: "入手手段", key: "source", enable: true, toggleSwitch: false },
-  //       { name: "元データ", key: "rawdata", enable: false, toggleSwitch: true },
-  //       { name: "イベント", key: "event", enable: true, toggleSwitch: false },
-  //     ];
-  //   }
-  //   return this._recipes.filter(_filter);
-  // }
 
   open(header: HeaderSetting[]) {
     this.dialog.open(SettingsComponent, { data: { headers: header, subj: this.headerChanged } });

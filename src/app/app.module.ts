@@ -24,6 +24,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatCardModule } from "@angular/material/card";
 import { CreatureComponent } from './components/creature/creature.component';
+import { GeneralSettingsComponent } from './components/general-settings/general-settings.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { CreatureComponent } from './components/creature/creature.component';
     RecipeComponent,
     SettingsComponent,
     CreatureComponent,
+    GeneralSettingsComponent,
   ],
   imports: [
     BrowserModule,

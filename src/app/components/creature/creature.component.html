@@ -27,7 +27,7 @@
 
 <div class="categories">
     <button mat-icon-button (click)="CategoryAll(categories)">
-        <mat-icon>weekend</mat-icon>
+        <mat-icon>bug_report</mat-icon>
     </button>
     <button mat-raised-button *ngFor="let c of categories" (click)="CategoryButton(c)"
         [class.active]="c.checked">{{c.name}}</button>

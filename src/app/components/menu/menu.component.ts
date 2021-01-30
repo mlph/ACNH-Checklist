@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { SettingsService } from 'src/app/services/settings.service';
+import { GeneralSettingsComponent } from '../general-settings/general-settings.component';
 
 @Component({
   selector: 'app-menu',
@@ -8,9 +10,16 @@ import { SettingsService } from 'src/app/services/settings.service';
 })
 export class MenuComponent implements OnInit {
 
-  constructor(public settings:SettingsService) { }
+  constructor(
+    public settings: SettingsService,
+    private dialog: MatDialog,
+  ) { }
 
   ngOnInit(): void {
+  }
+
+  generalSettings() {
+    this.dialog.open(GeneralSettingsComponent);
   }
 
 }
