@@ -66,8 +66,8 @@ export class ItemComponent implements OnInit {
   colData = {
     image: {
       id: "image",
-      data: (i: ItemJ): { src: string, name?: string; }[] => {
-        const result: { src: string, name?: string; }[] = [];
+      data: (i: ItemJ) => {
+        const result: { src: string, name?: string[]; }[] = [];
         [i.image, i.closetImage, i.albumImage, i.framedImage, i.storageImage, i.inventoryImage].forEach(v => {
           if (v) {
             result.push({ src: v });
@@ -76,7 +76,7 @@ export class ItemComponent implements OnInit {
         if (i.variations) {
           result.push(...i.variations.map(v => ({
             src: v.image || v.closetImage || v.storageImage || "",
-            name: v.variantTranslations?.japanese || v.patternTranslations?.japanese || ""
+            name: [v.variantTranslations?.japanese, v.patternTranslations?.japanese].filter(v => v) as string[]
           })));
         }
         return result;
@@ -87,7 +87,7 @@ export class ItemComponent implements OnInit {
     },
     variations: {
       id: "variants",
-      ja: (v: VariationElement) => (v.variantTranslations?.japanese || "") + (v.patternTranslations?.japanese || ""),
+      ja: (v: VariationElement) => [v.variantTranslations?.japanese, v.patternTranslations?.japanese].filter(v => v).join(","),
       isChecked: (i: ItemJ, v: VariationElement) => i.checked.variants.find(va => va.variantId === variantId(v))?.checked || false,
       check: (i: ItemJ, v: VariationElement) => {
         const vari = i.checked.variants.find(va => va.variantId === variantId(v));

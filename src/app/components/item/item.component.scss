@@ -1,3 +1,38 @@
+:host{
+    // height: 100%;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+}
+mat-toolbar{
+    flex-shrink: 0;
+    &.main{
+        background-color: lightgreen;
+    }
+    &.sub{
+        background-color: lightskyblue;
+    }
+    display: flex;
+    .space{
+        flex-grow: 1;
+    }
+    .page,.row{
+        width: 4em;
+        margin-left: 1em;
+        font-size: small;
+    }
+    .pages{
+        font-size: small;
+    }
+    .suffix{
+        font-size: small;
+        color: gray;
+    }
+}
+
+.contents{
+    overflow-y: auto;
+}
 .active{
     background-color: aqua;
 }
@@ -15,6 +50,8 @@ mat-table{
         overflow-x: auto;
         white-space: nowrap;
         .image-name{
+            // display: flex;
+            // flex-wrap: wrap;
             font-size: small;
         }
     }

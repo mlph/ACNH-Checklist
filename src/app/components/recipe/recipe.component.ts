@@ -51,9 +51,9 @@ export class RecipeComponent implements OnInit {
       data: (i: IRecipeJ) => this.t.SeasonsAndEvents(i.seasonEvent)
     },
     {
-      id: "series",
-      header: "シリーズ",
-      data: (i: IRecipeJ) => this.data.series(i.name),
+      id: "color",
+      header: "カードの色",
+      data: (i: IRecipeJ) => i.cardColor || "",
       sort: true
     },
   ];
@@ -102,15 +102,15 @@ export class RecipeComponent implements OnInit {
   };
 
   categories = [
+    Category.Tools,
     Category.Housewares,
     Category.Miscellaneous,
     Category.WallMounted,
     Category.Wallpaper,
-    Category.Rugs,
     Category.Floors,
+    Category.Rugs,
     Category.Equipment,
     Category.Other,
-    Category.Tools,
   ].map(v => ({ key: v, name: this.t.Category(v), checked: false }));
 
 
@@ -179,6 +179,7 @@ export class RecipeComponent implements OnInit {
           case 'name': return compare(a.nameJ, b.nameJ, isAsc);
           case 'series': return compare(this.data.series(a.name), this.data.series(b.name), isAsc);
           case 'source': return compare_ItemSource(a.source, b.source, isAsc);
+          case 'color': return compare(a.cardColor, b.cardColor, isAsc);
           case 'event': return compare(this.t.SeasonsAndEvents(a.seasonEvent), this.t.SeasonsAndEvents(b.seasonEvent), isAsc);
           default: return 0;
         }

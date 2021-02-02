@@ -1,5 +1,5 @@
-<mat-toolbar>
-    <mat-toolbar-row class="main">
+<!-- <mat-toolbar> -->
+    <mat-toolbar class="main">
         <button mat-icon-button (click)="OpenSettings()">
             <mat-icon>settings</mat-icon>
         </button>
@@ -24,8 +24,8 @@
             </mat-form-field>
             <span class="suffix">items per row</span>
         </div>
-    </mat-toolbar-row>
-    <mat-toolbar-row class="sub">
+    </mat-toolbar>
+    <mat-toolbar class="sub">
         <div>
             <mat-form-field>
                 <input matInput [(ngModel)]="search" (change)="Filter()">
@@ -35,8 +35,8 @@
             </mat-form-field>
         </div>
         <button mat-button (click)="ToggleState(eventstate, event)">{{event.state}}</button>
-    </mat-toolbar-row>
-</mat-toolbar>
+    </mat-toolbar>
+<!-- </mat-toolbar> -->
 
 <div class="content">
 

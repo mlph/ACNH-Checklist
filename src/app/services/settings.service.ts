@@ -26,7 +26,7 @@ const headersDefault = {
     { name: "画像", key: "image", enable: false, toggleSwitch: true },
     { name: "入手手段", key: "source", enable: true, toggleSwitch: false },
     { name: "イベント", key: "event", enable: true, toggleSwitch: false },
-    // { name: "シリーズ", key: "series", enable: false, toggleSwitch: true },
+    { name: "カードの色", key: "color", enable: false, toggleSwitch: false },
     { name: "材料", key: "material", enable: false, toggleSwitch: true },
     { name: "元データ", key: "rawdata", enable: false, toggleSwitch: true },
   ],
