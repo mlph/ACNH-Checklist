@@ -1,41 +1,44 @@
 <!-- <mat-toolbar> -->
-    <mat-toolbar class="main">
-        <button mat-icon-button (click)="OpenSettings()">
-            <mat-icon>settings</mat-icon>
-        </button>
-        <mat-checkbox *ngFor="let s of settings.headers('recipes', true)" [(ngModel)]="s.enable"
-            (change)="TableColumns()">
-            {{s.name}}
-        </mat-checkbox>
-        <div class="space"></div>
-        <div class="pages">
-            {{(page - 1) * row + 1}} - {{(page - 1) * row + showingData.length}} / {{filteredData.length}} /
-            {{raw.length}}
-        </div>
-        <div>
-            <mat-form-field class="page">
-                <input matInput [(ngModel)]="page" type="number" min="1" (change)="Filter()">
-            </mat-form-field>
-            <span class="suffix">page</span>
-        </div>
-        <div>
-            <mat-form-field class="row">
-                <input matInput [(ngModel)]="row" type="number" min="1" (change)="Filter()">
-            </mat-form-field>
-            <span class="suffix">items per row</span>
-        </div>
-    </mat-toolbar>
-    <mat-toolbar class="sub">
-        <div>
-            <mat-form-field>
-                <input matInput [(ngModel)]="search" (change)="Filter()">
-                <button mat-icon-button matSuffix (click)="search = '';Filter()">
-                    <mat-icon>close</mat-icon>
-                </button>
-            </mat-form-field>
-        </div>
-        <button mat-button (click)="ToggleState(eventstate, event)">{{event.state}}</button>
-    </mat-toolbar>
+<mat-toolbar class="main">
+    <button mat-icon-button (click)="OpenSettings()">
+        <mat-icon>settings</mat-icon>
+    </button>
+    <mat-checkbox *ngFor="let s of settings.headers('recipes', true)" [(ngModel)]="s.enable" (change)="TableColumns()">
+        {{s.name}}
+    </mat-checkbox>
+    <div class="space"></div>
+    <div class="pages">
+        {{(page - 1) * row + 1}} - {{(page - 1) * row + showingData.length}} / {{filteredData.length}} /
+        {{raw.length}}
+    </div>
+    <div>
+        <mat-form-field class="page">
+            <input matInput [(ngModel)]="page" type="number" min="1" (change)="Filter()">
+        </mat-form-field>
+        <span class="suffix">page</span>
+    </div>
+    <div>
+        <mat-form-field class="row">
+            <input matInput [(ngModel)]="row" type="number" min="1" (change)="Filter()">
+        </mat-form-field>
+        <span class="suffix">items per row</span>
+    </div>
+</mat-toolbar>
+<mat-toolbar class="sub">
+    <button class="check" mat-icon-button *ngFor="let c of checks" (click)="c.checked = !c.checked;Filter()"
+        [class.active]="c.checked">
+        <mat-icon>{{c.icon}}</mat-icon>
+    </button>
+    <div>
+        <mat-form-field>
+            <input matInput [(ngModel)]="search" (change)="Filter()">
+            <button mat-icon-button matSuffix (click)="search = '';Filter()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </mat-form-field>
+    </div>
+    <button mat-button (click)="ToggleState(eventstate, event)">{{event.state}}</button>
+</mat-toolbar>
 <!-- </mat-toolbar> -->
 
 <div class="content">
@@ -60,10 +63,9 @@
 
         <ng-container [matColumnDef]="colData.check.id">
             <mat-header-cell class="h check" *matHeaderCellDef></mat-header-cell>
-            <mat-cell class="c check" *matCellDef="let element" (click)="colData.check.checked(element)">
-                <button mat-icon-button>
-                    <mat-icon>{{colData.check.icon(element)}}</mat-icon>
-                </button>
+            <mat-cell class="c check" *matCellDef="let element">
+                <mat-checkbox [ngModel]="colData.check.IsChecked(element)"
+                    (ngModelChange)="colData.check.check(element)"></mat-checkbox>
             </mat-cell>
         </ng-container>
         <ng-container [matColumnDef]="colData.image.id">
@@ -105,7 +107,7 @@
         </ng-container>
 
         <mat-header-row *matHeaderRowDef="col"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: col;"></mat-row>
+        <mat-row *matRowDef="let row; columns: col;" (click)="clickRow(row)" [class.checked]="colData.check.IsChecked(row)"></mat-row>
     </mat-table>
 
 </div>

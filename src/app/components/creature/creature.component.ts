@@ -20,6 +20,10 @@ export class CreatureComponent implements OnInit {
 
   page = 1;
   row = 100;
+  checks = [
+    { checked: true, icon: "check_box_outline_blank" },
+    { checked: true, icon: "check_box" },
+  ];
 
 
   search = "";
@@ -70,15 +74,12 @@ export class CreatureComponent implements OnInit {
   colData = {
     check: {
       id: "check",
-      icon: (i: ICreatureJ) => {
-        switch (i.checked) {
-          case true: return "check_box";
-          case false: return "check_box_outline_blank";
-        }
+      check: (i: ICreatureJ) => {
+        // i.checked = !i.checked;
+        this.settings.checklist.creatures[i.internalId] = !this.settings.checklist.creatures[i.internalId];
       },
-      checked: (i: ICreatureJ) => {
-        i.checked = !i.checked;
-        this.settings.checklist.recipes[i.internalId] = i.checked;
+      IsChecked: (i: ICreatureJ) => {
+        return this.settings.checklist.creatures[i.internalId];
       }
     },
     period: {
@@ -180,6 +181,12 @@ export class CreatureComponent implements OnInit {
 
     this.filteredData = this.raw
       .filter(d => this.categories.find(c => c.key === d.sourceSheet)?.checked)
+      .filter(d => {
+        switch (this.settings.checklist.creatures[d.internalId] || false) {
+          case false: return this.checks[0].checked;
+          case true: return this.checks[1].checked;
+        }
+      })
       .filter(this.SearchWord)
       .sort((a, b) => {
         const isAsc = this.lastSort.direction === 'asc';
@@ -246,5 +253,9 @@ export class CreatureComponent implements OnInit {
     this.Filter();
   }
 
-
+  clickRow(c: ICreatureJ) {
+    if (this.settings.generals.clickRowCheck) {
+      this.colData.check.check(c);
+    }
+  }
 }

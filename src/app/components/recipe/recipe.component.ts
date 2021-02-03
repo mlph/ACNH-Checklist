@@ -23,6 +23,10 @@ export class RecipeComponent implements OnInit {
 
   eventstate = ["全て", "季節/イベント限定のみ", "季節/イベント限定を除く"];
   event = { state: this.eventstate[0] };
+  checks = [
+    { checked: true, icon: "check_box_outline_blank" },
+    { checked: true, icon: "check_box" },
+  ];
 
 
   search = "";
@@ -74,25 +78,14 @@ export class RecipeComponent implements OnInit {
     source: {
       id: "source"
     },
-    // variations: {
-    //   id: "variations",
-    //   ja: (v: VariationElement) => v.variantTranslations?.japanese || v.patternTranslations?.japanese
-    // },
-    // var: {
-    //   id: "var",
-    //   exist: (i: ItemJ) => !!i.variations
-    // }
     check: {
       id: "check",
-      icon: (i: IRecipeJ) => {
-        switch (i.checked) {
-          case true: return "check_box";
-          case false: return "check_box_outline_blank";
-        }
+      check: (i: IRecipeJ) => {
+        // i.checked = !i.checked;
+        this.settings.checklist.recipes[i.internalId] = !this.settings.checklist.recipes[i.internalId];
       },
-      checked: (i: IRecipeJ) => {
-        i.checked = !i.checked;
-        this.settings.checklist.recipes[i.internalId] = i.checked;
+      IsChecked: (i: IRecipeJ) => {
+        return this.settings.checklist.recipes[i.internalId];
       }
     },
     material: {
@@ -165,6 +158,12 @@ export class RecipeComponent implements OnInit {
 
     this.filteredData = this.raw
       .filter(d => this.categories.find(c => c.key === d.category)?.checked)
+      .filter(d => {
+        switch (this.settings.checklist.recipes[d.internalId] || false) {
+          case false: return this.checks[0].checked;
+          case true: return this.checks[1].checked;
+        }
+      })
       .filter(this.SearchWord)
       .filter(d => {
         switch (this.event.state) {
@@ -240,6 +239,12 @@ export class RecipeComponent implements OnInit {
     const i = states.findIndex(s => s === current.state);
     current.state = states[(i + 1) % states.length];
     this.Filter();
+  }
+
+  clickRow(c: IRecipeJ) {
+    if (this.settings.generals.clickRowCheck) {
+      this.colData.check.check(c);
+    }
   }
 
 }

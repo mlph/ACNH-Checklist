@@ -13,6 +13,12 @@ mat-toolbar{
     }
     &.sub{
         background-color: lightskyblue;
+        .check{
+            color: lightblue;
+            &.active{
+                color: red;
+            }
+        }
     }
     display: flex;
     .space{

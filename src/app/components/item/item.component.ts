@@ -6,10 +6,14 @@ import { SettingsService } from 'src/app/services/settings.service';
 import { TranslationService } from 'src/app/services/translation.service';
 
 import { NihongoService } from 'src/app/services/nihongo.service';
+import { MatCheckboxDefaultOptions, MAT_CHECKBOX_DEFAULT_OPTIONS } from '@angular/material/checkbox';
 @Component({
   selector: 'app-item',
   templateUrl: './item.component.html',
-  styleUrls: ['./item.component.scss']
+  styleUrls: ['./item.component.scss'],
+  // providers: [
+  //   { provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: { clickAction: 'noop' } as MatCheckboxDefaultOptions }
+  // ]
 })
 export class ItemComponent implements OnInit {
 
@@ -25,6 +29,11 @@ export class ItemComponent implements OnInit {
   catalogForSale = false;
   diystate = ["全て", "DIYのみ", "DIY以外"];
   diy = { state: this.diystate[0] };
+  checks = [
+    { checked: true, icon: "check_box_outline_blank" },
+    { checked: true, icon: "check_box" },
+    { checked: true, icon: "indeterminate_check_box" },
+  ];
 
   search = "";
   private _search = "";
@@ -88,22 +97,21 @@ export class ItemComponent implements OnInit {
     variations: {
       id: "variants",
       ja: (v: VariationElement) => [v.variantTranslations?.japanese, v.patternTranslations?.japanese].filter(v => v).join(","),
-      isChecked: (i: ItemJ, v: VariationElement) => i.checked.variants.find(va => va.variantId === variantId(v))?.checked || false,
+      IsChecked: (i: ItemJ, v: VariationElement) => this.vari_IsChecked(i, v),
       check: (i: ItemJ, v: VariationElement) => {
-        const vari = i.checked.variants.find(va => va.variantId === variantId(v));
-        if (vari) {
-          vari.checked = !vari.checked;
-        }
+
+        this.settings.checklist.items[i.internalId] = this.settings.checklist.items[i.internalId] || { base: "false", variants: {} };
+        this.settings.checklist.items[i.internalId].variants[variantId(v)] = !this.vari_IsChecked(i, v);
+
         if (i.variations) {
-          if (i.checked.variants.every(va => va.checked)) {
-            i.checked.base = "true";
-          } else if (i.checked.variants.every(va => !va.checked)) {
-            i.checked.base = "false";
+          if (i.variations.every(va => this.vari_IsChecked(i, va))) {
+            this.settings.checklist.items[i.internalId].base = "true";
+          } else if (i.variations.every(va => !this.vari_IsChecked(i, va))) {
+            this.settings.checklist.items[i.internalId].base = "false";
           } else {
-            i.checked.base = "partial";
+            this.settings.checklist.items[i.internalId].base = "partial";
           }
         }
-        this.settings.checklist.items[i.internalId] = i.checked;
       }
     },
     var: {
@@ -112,21 +120,23 @@ export class ItemComponent implements OnInit {
     },
     check: {
       id: "check",
-      icon: (i: ItemJ) => {
-        switch (i.checked.base) {
-          case "true": return "check_box";
-          case "false": return "check_box_outline_blank";
-          case "partial": return "indeterminate_check_box";
-        }
-      },
-      checked: (i: ItemJ) => {
+      // icon: (i: ItemJ) => {
+      //   switch (i.checked.base) {
+      //     case "true": return "check_box";
+      //     case "false": return "check_box_outline_blank";
+      //     case "partial": return "indeterminate_check_box";
+      //   }
+      // },
+      check: (i: ItemJ) => {
         if (i.variations && i.variations.length > 0) {
         } else {
-          i.checked.base = i.checked.base === "false" ? "true" : "false";
+          this.settings.checklist.items[i.internalId] = this.settings.checklist.items[i.internalId] || { base: "false" };
+          this.settings.checklist.items[i.internalId].base = this.settings.checklist.items[i.internalId].base === "false" ? "true" : "false";
         }
-        this.settings.checklist.items[i.internalId] = i.checked;
       },
-      isChecked: (i: ItemJ) => i.checked.base === "true"
+      // isChecked: (i: ItemJ) => i.checked.base === "true",
+      IsChecked: (i: ItemJ) => this.settings.checklist.items[i.internalId]?.base === "true",
+      IsPartial: (i: ItemJ) => this.settings.checklist.items[i.internalId]?.base === "partial"
     },
     material: {
       id: "material",
@@ -225,6 +235,13 @@ export class ItemComponent implements OnInit {
       .filter(this.SearchWord)
       .filter(d => this.catalogForSale ? d.catalog === Catalog.ForSale : true)
       .filter(d => {
+        switch (this.settings.checklist.items[d.internalId]?.base || "false") {
+          case "false": return this.checks[0].checked;
+          case "true": return this.checks[1].checked;
+          case "partial": return this.checks[2].checked;
+        }
+      })
+      .filter(d => {
         switch (this.diy.state) {
           case (this.diystate[1]): return d.diy === true;
           case (this.diystate[2]): return d.diy === false;
@@ -297,5 +314,14 @@ export class ItemComponent implements OnInit {
     this.Filter();
   }
 
+  vari_IsChecked = (i: ItemJ, v: VariationElement) => this.settings.checklist.items[i.internalId]?.variants[variantId(v)];
+
+  clickRow(c: ItemJ) {
+    if (this.settings.generals.clickRowCheck) {
+      this.colData.check.check(c);
+    }
+  }
 
 };
+
+

@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { items } from 'animal-crossing';
 import { Subject } from 'rxjs';
 import { SettingsComponent } from '../components/settings/settings.component';
 
+//@ts-ignore
+import * as cjson from 'compressed-json';
+
 const LSkey = "acnh_checklist";
 const LSchecklist = "list";
-const LSSitems = "s.items";
-const LSSrecipes = "s.recipes";
+// const LSSitems = "s.items";
+// const LSSrecipes = "s.recipes";
+const LSsettings = "settings";
 
 const headersDefault = {
   items: [
@@ -50,9 +55,9 @@ const headersDefault = {
 })
 export class SettingsService {
 
-  private _items!: HeaderSetting[];
-  private _recipes!: HeaderSetting[];
-  private _creatures!: HeaderSetting[];
+  // private _items!: HeaderSetting[];
+  // private _recipes!: HeaderSetting[];
+  // private _creatures!: HeaderSetting[];
 
   private _headers: {
     items?: HeaderSetting[],
@@ -62,7 +67,8 @@ export class SettingsService {
 
   generals = {
     materialImage: true,
-    materialKanji: false,
+    // materialKanji: false,
+    clickRowCheck: false
   };
 
   checklist: {
@@ -70,13 +76,13 @@ export class SettingsService {
       [internalId: number]: {
         base: threeState;
         variants: {
-          variantId: string;
-          checked: boolean;
-        }[];
+          [variantId: string]: boolean;
+        };
       };
     };
     recipes: { [internalId: number]: boolean; };
-  } = { items: {}, recipes: {} };
+    creatures: { [internalId: number]: boolean; };
+  } = { items: {}, recipes: {}, creatures: {} };
 
 
   // settingChanged: Subject<{ prop: string, data: any; }> =
@@ -104,22 +110,34 @@ export class SettingsService {
   }
 
   save() {
-    // localStorage[`${LSkey}.${LSchecklist}`] = JSON.stringify(this.checklist);
-    // localStorage[`${LSkey}.${LSSitems}`] = JSON.stringify(this.items);
-    // localStorage[`${LSkey}.${LSSrecipes}`] = JSON.stringify(this.recipes);
+    localStorage[`${LSkey}.${LSchecklist}`] = JSON.stringify(cjson.compress(this.checklist));
+    localStorage[`${LSkey}.${LSsettings}`] = JSON.stringify({
+      headers: this._headers,
+      generals: this.generals
+    });
   }
 
   load() {
-    // const [c, i, r] = [localStorage[`${LSkey}.${LSchecklist}`], localStorage[`${LSkey}.${LSSitems}`], localStorage[`${LSkey}.${LSSrecipes}`]];
-    // if (c) {
-    //   this.checklist = JSON.parse(c);
-    // }
-    // if (i) {
-    //   this.items = JSON.parse(i);
-    // }
-    // if (r) {
-    //   this.recipes = JSON.parse(r);
-    // }
+    const [c, s] = [
+      JSON.parse(localStorage[`${LSkey}.${LSchecklist}`]),
+      localStorage[`${LSkey}.${LSsettings}`],
+    ];
+    if (c) {
+      this.checklist = cjson.decompress(c) || {};
+      this.checklist.items = this.checklist.items || {};
+      this.checklist.recipes = this.checklist.recipes || {};
+      this.checklist.creatures = this.checklist.creatures || {};
+    }
+    if (s) {
+      const ss = JSON.parse(s);
+      this._headers = ss.headers || {};
+      this.generals = ss.generals || {};
+    }
+  }
+
+
+  variantList(internalId: number) {
+    items.find(i => i.internalId);
   }
 
 }
@@ -130,4 +148,13 @@ export type HeaderSetting = {
   key: string;
   enable: boolean;
   toggleSwitch: boolean;
+};
+
+
+const ObjectKeysNumber = <T>(obj: { [key: number]: T; }) => {
+  return Object.keys(obj).map(s => Number.parseInt(s));
+};
+
+const forof = <T>(obj: { [key: number]: T; }, callback: (arg0: T) => void) => {
+
 };

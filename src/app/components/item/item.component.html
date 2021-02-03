@@ -24,6 +24,10 @@
     </div>
 </mat-toolbar>
 <mat-toolbar class="sub">
+    <button class="check" mat-icon-button *ngFor="let c of checks" (click)="c.checked = !c.checked;Filter()"
+        [class.active]="c.checked">
+        <mat-icon>{{c.icon}}</mat-icon>
+    </button>
     <div>
         <mat-form-field>
             <input matInput [(ngModel)]="search" (change)="Filter()">
@@ -32,7 +36,7 @@
             </button>
         </mat-form-field>
     </div>
-    <mat-checkbox [(ngModel)]="catalogForSale" (change)="Filter()">購入可のみ</mat-checkbox>
+    <mat-checkbox [(ngModel)]="catalogForSale" (click)="Filter()">購入可のみ</mat-checkbox>
     <button mat-button (click)="ToggleState(diystate, diy)">{{diy.state}}</button>
 </mat-toolbar>
 <!-- <mat-form-field>
@@ -129,18 +133,19 @@
             <mat-cell class="d_variations" *matCellDef="let element">
                 <div>
                     <ng-container *ngIf="!element.variations;else vari">
-                        <button mat-icon-button (click)="colData.check.checked(element)">
+                        <!-- <button mat-icon-button (click)="colData.check.checked(element)">
                             <mat-icon>{{colData.check.icon(element)}}</mat-icon>
-                        </button>
-                        <!-- <mat-checkbox [checked]="colData.check.isChecked(element)"
-                        (ngModelChange)="colData.check.checked(element)"></mat-checkbox> -->
+                        </button> -->
+                        <app-checkbox-noop [checked]="colData.check.IsChecked(element)"
+                            (click)="colData.check.check(element)">
+                        </app-checkbox-noop>
                     </ng-container>
                     <ng-template #vari>
                         <ng-container *ngFor="let s of element.variations;let i = index">
                             <div>
-                                <mat-checkbox [checked]="colData.variations.isChecked(element, s)"
-                                    (change)="colData.variations.check(element, s)">{{colData.variations.ja(s)}}
-                                </mat-checkbox>
+                                <app-checkbox-noop [checked]="colData.variations.IsChecked(element, s)"
+                                    (click)="colData.variations.check(element, s)">{{colData.variations.ja(s)}}
+                                </app-checkbox-noop>
                                 <!-- <ng-container *ngIf="IsNotLast(i, element.variations)">,</ng-container> -->
                             </div>
                         </ng-container>
@@ -150,10 +155,14 @@
         </ng-container>
         <ng-container [matColumnDef]="colData.check.id">
             <mat-header-cell class="check" *matHeaderCellDef></mat-header-cell>
-            <mat-cell class="check" *matCellDef="let element" (click)="colData.check.checked(element)">
-                <button mat-icon-button>
-                    <mat-icon>{{colData.check.icon(element)}}</mat-icon>
-                </button>
+            <mat-cell class="check" *matCellDef="let element">
+                <!-- <mat-checkbox [ngModel]="colData.check.IsChecked(element)"
+                    [indeterminate]="colData.check.IsPartial(element)" (click)="colData.check.check(element)"
+                    [color]="colData.check.IsPartial(element) ? 'warn' : 'accent'">
+                </mat-checkbox> -->
+                <app-checkbox-noop [checked]="colData.check.IsChecked(element)"
+                    [indeterminate]="colData.check.IsPartial(element)" (click)="colData.check.check(element)">
+                </app-checkbox-noop>
             </mat-cell>
         </ng-container>
         <ng-container [matColumnDef]="colData.material.id">
@@ -167,6 +176,6 @@
         </ng-container>
 
         <mat-header-row *matHeaderRowDef="col"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: col;"></mat-row>
+        <mat-row *matRowDef="let row; columns: col;" (click)="clickRow(row)"></mat-row>
     </mat-table>
 </div>

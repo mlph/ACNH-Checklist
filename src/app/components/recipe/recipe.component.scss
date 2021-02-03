@@ -13,6 +13,12 @@ mat-toolbar{
     }
     &.sub{
         background-color: lightskyblue;
+        .check{
+            color: lightblue;
+            &.active{
+                color: red;
+            }
+        }
     }
     display: flex;
     .space{
@@ -34,11 +40,11 @@ mat-toolbar{
 
 .content{
     overflow-y: auto;
+    .active{
+        background-color: aqua;
+    }
 }
 
-.active{
-    background-color: aqua;
-}
 
 mat-table{
     // width: 95vw;
@@ -52,6 +58,10 @@ mat-table{
     //         font-size: small;
     //     }
     // }
+
+    .checked{
+        background-color: rgb(83, 150, 172, 0.2);
+    }
     img{
         max-height: 128px;
     }

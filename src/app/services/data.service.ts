@@ -61,16 +61,16 @@ export class DataService {
         return r.translations?.id || -1;
       })();
       r.internalId = id;
-      r.checked = this.settings.checklist.items[id];
-      if (r.checked == null) {
-        const c: { base: threeState, variants: { variantId: string; checked: boolean; }[]; } = {
-          base: "false",
-          variants: (r.variations || [])
-            .map(v => ({ variantId: variantId(v), checked: false }))
-        };
+      // r.checked = this.settings.checklist.items[id];
+      // if (r.checked == null) {
+      //   const c: { base: threeState, variants: { variantId: string; checked: boolean; }[]; } = {
+      //     base: "false",
+      //     variants: (r.variations || [])
+      //       .map(v => ({ variantId: variantId(v), checked: false }))
+      //   };
 
-        r.checked = c;
-      };
+      //   r.checked = c;
+      // };
 
       // (r.variations || []).filter(v => !v.variantId && !v.variation).forEach(c => console.log(c));
 
@@ -80,14 +80,14 @@ export class DataService {
       const r = i as IRecipeJ;
       r.nameJ = i.translations?.japanese || i.name;
       r.nameH = this.nihongo.toHiragana(r.nameJ);
-      r.checked = !!this.settings.checklist.recipes[r.internalId];
+      // r.checked = !!this.settings.checklist.recipes[r.internalId];
       return r;
     };
     const Process_Creature = (i: ICreature) => {
       const r = i as ICreatureJ;
       r.nameJ = i.translations.japanese;
       r.nameH = this.nihongo.toHiragana(r.nameJ);
-      r.checked = !!this.settings.checklist.recipes[r.internalId];
+      // r.checked = !!this.settings.checklist.recipes[r.internalId];
       return r;
     };
 
@@ -165,23 +165,23 @@ export type ItemJ = Item & {
   nameJ: string;
   nameH: string;
   internalId: number;
-  checked: {
-    base: threeState;
-    variants: {
-      variantId: string;
-      checked: boolean;
-    }[];
-  };
+  // checked: {
+  //   base: threeState;
+  //   variants: {
+  //     variantId: string;
+  //     checked: boolean;
+  //   }[];
+  // };
 };
 export type IRecipeJ = IRecipe & {
   nameJ: string;
   nameH: string;
-  checked: boolean;
+  // checked: boolean;
 };
 export type ICreatureJ = ICreature & {
   nameJ: string;
   nameH: string;
-  checked: boolean;
+  // checked: boolean;
   // discriptionJ: string;
   // catchPhraseJ: string;
 };

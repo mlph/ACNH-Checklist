@@ -25,6 +25,10 @@
     </div>
 </mat-toolbar>
 <mat-toolbar class="sub">
+    <button class="check" mat-icon-button *ngFor="let c of checks" (click)="c.checked = !c.checked;Filter()"
+        [class.active]="c.checked">
+        <mat-icon>{{c.icon}}</mat-icon>
+    </button>
     <div>
         <mat-form-field>
             <input matInput [(ngModel)]="search" (change)="Filter()">
@@ -124,13 +128,12 @@
 
         <ng-container [matColumnDef]="colData.check.id">
             <mat-header-cell class="check" *matHeaderCellDef></mat-header-cell>
-            <mat-cell class="check" *matCellDef="let element" (click)="colData.check.checked(element)">
-                <button mat-icon-button>
-                    <mat-icon>{{colData.check.icon(element)}}</mat-icon>
-                </button>
+            <mat-cell class="check" *matCellDef="let element">
+                <mat-checkbox [ngModel]="colData.check.IsChecked(element)"
+                    (ngModelChange)="colData.check.check(element)"></mat-checkbox>
             </mat-cell>
         </ng-container>
         <mat-header-row *matHeaderRowDef="col"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: col;"></mat-row>
+        <mat-row *matRowDef="let row; columns: col;" (click)="clickRow(row)"></mat-row>
     </mat-table>
 </div>

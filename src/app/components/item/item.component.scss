@@ -11,6 +11,12 @@ mat-toolbar{
     }
     &.sub{
         background-color: lightskyblue;
+        .check{
+            color: lightblue;
+            &.active{
+                color: red;
+            }
+        }
     }
     display: flex;
     .space{
@@ -32,9 +38,9 @@ mat-toolbar{
 
 .contents{
     overflow-y: auto;
-}
-.active{
-    background-color: aqua;
+    .active{
+        background-color: aqua;
+    }
 }
 
 mat-table{
@@ -69,9 +75,9 @@ mat-table{
     //     max-width: 20em;
     // }
     .d_variations>div{
-        max-width: 300px;
+        width: 300px;
         max-height: 150px;
-        overflow: auto;
+        overflow-y: auto;
         display: flex;
         flex-wrap: wrap;
         padding: 0.6em 0;

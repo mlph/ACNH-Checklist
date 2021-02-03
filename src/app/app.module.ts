@@ -25,6 +25,7 @@ import { MatDialogModule } from "@angular/material/dialog";
 import { MatCardModule } from "@angular/material/card";
 import { CreatureComponent } from './components/creature/creature.component';
 import { GeneralSettingsComponent } from './components/general-settings/general-settings.component';
+import { CheckboxNoopComponent } from './components/parts/checkbox-noop/checkbox-noop.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { GeneralSettingsComponent } from './components/general-settings/general-
     SettingsComponent,
     CreatureComponent,
     GeneralSettingsComponent,
+    CheckboxNoopComponent,
   ],
   imports: [
     BrowserModule,
