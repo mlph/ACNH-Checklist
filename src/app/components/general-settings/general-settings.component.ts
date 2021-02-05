@@ -8,9 +8,23 @@ import { SettingsService } from 'src/app/services/settings.service';
 })
 export class GeneralSettingsComponent implements OnInit {
 
-  constructor(public s:SettingsService) { }
+  exported = "";
+  toImport = "";
+
+  ex = false;
+
+  constructor(public s: SettingsService) { }
 
   ngOnInit(): void {
+  }
+
+  export() {
+    this.exported = this.s.stringify();
+  }
+
+  import() {
+    this.s.load(this.toImport);
+    this.s.needToSave = true;
   }
 
 }

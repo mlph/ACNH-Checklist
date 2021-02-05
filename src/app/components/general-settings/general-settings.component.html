@@ -1,2 +1,15 @@
-<mat-checkbox [(ngModel)]="s.generals.materialImage">材料の画像</mat-checkbox>
-<mat-checkbox [(ngModel)]="s.generals.clickRowCheck">行クリックでチェック</mat-checkbox>
+<div class="checks">
+    <mat-checkbox [(ngModel)]="s.generals.materialImage" (click)="s.mayNeedToSave=true">材料の画像</mat-checkbox>
+    <mat-checkbox [(ngModel)]="s.generals.clickRowCheck" (click)="s.mayNeedToSave=true">行クリックでチェック</mat-checkbox>
+</div>
+<button (click)="ex = !ex">エクスポート</button>
+<div class="IO" *ngIf="ex">
+    <div>
+        <button (click)="export()">export</button>
+        <textarea [value]="exported" rows="20"></textarea>
+    </div>
+    <div>
+        <textarea [(ngModel)]="toImport" rows="10"></textarea>
+        <button (click)="import()">import</button>
+    </div>
+</div>

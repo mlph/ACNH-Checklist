@@ -4,8 +4,6 @@ import { Category, Item, VariationElement, Version } from 'animal-crossing/lib/t
 import { TranslationService } from './translation.service';
 
 import { NihongoService } from './nihongo.service';
-import { SourceSheet } from 'animal-crossing/lib/types/Translation';
-import { Personality } from 'animal-crossing/lib/types/Villager';
 import { SettingsService, threeState } from './settings.service';
 
 @Injectable({

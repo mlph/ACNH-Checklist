@@ -8,10 +8,6 @@ import { SettingsComponent } from '../components/settings/settings.component';
 import * as cjson from 'compressed-json';
 
 const LSkey = "acnh_checklist";
-const LSchecklist = "list";
-// const LSSitems = "s.items";
-// const LSSrecipes = "s.recipes";
-const LSsettings = "settings";
 
 const headersDefault = {
   items: [
@@ -55,9 +51,6 @@ const headersDefault = {
 })
 export class SettingsService {
 
-  // private _items!: HeaderSetting[];
-  // private _recipes!: HeaderSetting[];
-  // private _creatures!: HeaderSetting[];
 
   private _headers: {
     items?: HeaderSetting[],
@@ -85,15 +78,18 @@ export class SettingsService {
   } = { items: {}, recipes: {}, creatures: {} };
 
 
-  // settingChanged: Subject<{ prop: string, data: any; }> =
-  //   new Subject();
 
   headerChanged = new Subject<never>();
+
+  needToSave = false;
+  mayNeedToSave = false;
 
   constructor(
     private dialog: MatDialog
   ) {
-    this.load();
+    this.load(localStorage.getItem(LSkey) || "");
+
+    this.headerChanged.subscribe(v => this.mayNeedToSave = true);
   }
 
   headers(key: "items" | "recipes" | "creatures", filtered = false) {
@@ -109,35 +105,41 @@ export class SettingsService {
     this.dialog.open(SettingsComponent, { data: { headers: header, subj: this.headerChanged } });
   }
 
+  stringify() {
+    return JSON.stringify(
+      cjson.compress({
+        list: this.checklist,
+        headers: this._headers,
+        generals: this.generals
+      })
+    );
+  }
+
+  parse(data: string) {
+    const p = JSON.parse(data);
+    const s = cjson.decompress(p);
+    return {
+      list: s.list,
+      headers: s.headers,
+      generals: s.generals
+    };
+  }
+
   save() {
-    localStorage[`${LSkey}.${LSchecklist}`] = JSON.stringify(cjson.compress(this.checklist));
-    localStorage[`${LSkey}.${LSsettings}`] = JSON.stringify({
-      headers: this._headers,
-      generals: this.generals
-    });
+    localStorage.setItem(LSkey, this.stringify());
+    this.needToSave = false;
   }
 
-  load() {
-    const [c, s] = [
-      JSON.parse(localStorage[`${LSkey}.${LSchecklist}`]),
-      localStorage[`${LSkey}.${LSsettings}`],
-    ];
-    if (c) {
-      this.checklist = cjson.decompress(c) || {};
-      this.checklist.items = this.checklist.items || {};
-      this.checklist.recipes = this.checklist.recipes || {};
-      this.checklist.creatures = this.checklist.creatures || {};
+  load(data: string) {
+    if (data) {
+      const p = this.parse(data);
+      this.checklist = p.list || {};
+      this._headers = p.headers || {};
+      this.generals = p.generals || {};
     }
-    if (s) {
-      const ss = JSON.parse(s);
-      this._headers = ss.headers || {};
-      this.generals = ss.generals || {};
-    }
-  }
-
-
-  variantList(internalId: number) {
-    items.find(i => i.internalId);
+    this.checklist.items = this.checklist.items || {};
+    this.checklist.recipes = this.checklist.recipes || {};
+    this.checklist.creatures = this.checklist.creatures || {};
   }
 
 }
@@ -150,11 +152,3 @@ export type HeaderSetting = {
   toggleSwitch: boolean;
 };
 
-
-const ObjectKeysNumber = <T>(obj: { [key: number]: T; }) => {
-  return Object.keys(obj).map(s => Number.parseInt(s));
-};
-
-const forof = <T>(obj: { [key: number]: T; }, callback: (arg0: T) => void) => {
-
-};

@@ -76,6 +76,7 @@ export class CreatureComponent implements OnInit {
       id: "check",
       check: (i: ICreatureJ) => {
         // i.checked = !i.checked;
+        this.settings.needToSave = true;
         this.settings.checklist.creatures[i.internalId] = !this.settings.checklist.creatures[i.internalId];
       },
       IsChecked: (i: ICreatureJ) => {

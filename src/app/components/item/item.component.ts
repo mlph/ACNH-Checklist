@@ -30,9 +30,9 @@ export class ItemComponent implements OnInit {
   diystate = ["全て", "DIYのみ", "DIY以外"];
   diy = { state: this.diystate[0] };
   checks = [
-    { checked: true, icon: "check_box_outline_blank" },
-    { checked: true, icon: "check_box" },
-    { checked: true, icon: "indeterminate_check_box" },
+    { checked: true, icon: "check_box_outline_blank", key: "false" },
+    { checked: true, icon: "check_box", key: "true" },
+    { checked: true, icon: "indeterminate_check_box", key: "partial" },
   ];
 
   search = "";
@@ -100,6 +100,7 @@ export class ItemComponent implements OnInit {
       IsChecked: (i: ItemJ, v: VariationElement) => this.vari_IsChecked(i, v),
       check: (i: ItemJ, v: VariationElement) => {
 
+        this.settings.needToSave = true;
         this.settings.checklist.items[i.internalId] = this.settings.checklist.items[i.internalId] || { base: "false", variants: {} };
         this.settings.checklist.items[i.internalId].variants[variantId(v)] = !this.vari_IsChecked(i, v);
 
@@ -130,6 +131,7 @@ export class ItemComponent implements OnInit {
       check: (i: ItemJ) => {
         if (i.variations && i.variations.length > 0) {
         } else {
+          this.settings.needToSave = true;
           this.settings.checklist.items[i.internalId] = this.settings.checklist.items[i.internalId] || { base: "false" };
           this.settings.checklist.items[i.internalId].base = this.settings.checklist.items[i.internalId].base === "false" ? "true" : "false";
         }
@@ -205,42 +207,17 @@ export class ItemComponent implements OnInit {
 
 
   Filter() {
-    const compare = <T>(a?: number | string | T, b?: number | string | T, isAsc?: boolean) => {
-      const asc = isAsc ? 1 : -1;
-      if (b == null) { return -1 * asc; }
-      if (a == null) { return 1 * asc; }
-      if (typeof a === "string" && typeof b === "string") {
-        return this.nihongo.compareKana(a, b) * asc;
-      }
-      return (a < b ? -1 : 1) * asc;
-    };
-
-    const compare_ItemSource = (a?: Array<string>, b?: Array<string>, isAsc?: boolean) => {
-      const asc = isAsc ? 1 : -1;
-      if (b == null) { return -1 * asc; }
-      if (a == null) { return 1 * asc; }
-      for (let i = 0; i < a.length && i < b.length; i++) {
-        if (a[i] !== b[i]) {
-          return compare(this.t.ItemsSource(a[i]), this.t.ItemsSource(b[i])) * asc;
-        }
-      }
-      return a.length - b.length;
-    };
 
     this._search = this.nihongo.toHiragana(this.search);
     // console.log(this._search);
+
+    // const t = Date.now()
 
     this.filteredData = this.raw
       .filter(d => this.categories.find(c => c.key === d.sourceSheet)?.checked)
       .filter(this.SearchWord)
       .filter(d => this.catalogForSale ? d.catalog === Catalog.ForSale : true)
-      .filter(d => {
-        switch (this.settings.checklist.items[d.internalId]?.base || "false") {
-          case "false": return this.checks[0].checked;
-          case "true": return this.checks[1].checked;
-          case "partial": return this.checks[2].checked;
-        }
-      })
+      .filter(this.FilterCheck())
       .filter(d => {
         switch (this.diy.state) {
           case (this.diystate[1]): return d.diy === true;
@@ -248,16 +225,18 @@ export class ItemComponent implements OnInit {
           default: return true;
         }
       })
-      .sort((a, b) => {
-        const isAsc = this.lastSort.direction === 'asc';
-        switch (this.lastSort.active) {
-          case 'name': return compare(a.nameJ, b.nameJ, isAsc);
-          case 'series': return compare(a.seriesTranslations?.japanese, b.seriesTranslations?.japanese, isAsc);
-          case 'source': return compare_ItemSource(a.source, b.source, isAsc);
-          case 'catalog': return compare(a.catalog, b.catalog, isAsc);
-          default: return 0;
-        }
-      });
+      .sort(this.Sort());
+    // console.log(Date.now() - t)
+    // .sort((a, b) => {
+    //   const isAsc = this.lastSort.direction === 'asc';
+    //   switch (this.lastSort.active) {
+    //     case 'name': return compare(a.nameJ, b.nameJ, isAsc);
+    //     case 'series': return compare(a.seriesTranslations?.japanese, b.seriesTranslations?.japanese, isAsc);
+    //     case 'source': return compare_ItemSource(a.source, b.source, isAsc);
+    //     case 'catalog': return compare(a.catalog, b.catalog, isAsc);
+    //     default: return 0;
+    //   }
+    // });
 
     if (this.filteredData.length <= (this.page - 1) * this.row) {
       this.page = 1;
@@ -265,7 +244,6 @@ export class ItemComponent implements OnInit {
     const s = (this.page - 1) * this.row;
     this.showingData = this.filteredData
       .slice(s, s + this.row);
-
 
   }
 
@@ -295,9 +273,51 @@ export class ItemComponent implements OnInit {
       return true;
     }
 
-
     return d.nameH.includes(this._search) || d.nameJ.toUpperCase().includes(this.search.toUpperCase());
   };
+
+  FilterCheck(): ((i: ItemJ) => boolean) {
+    if (this.checks.every(c => c.checked)) {
+      return () => true;
+    }
+    if (this.checks.every(c => !c.checked)) {
+      return () => false;
+    }
+    const cs = this.checks.filter(c => c.checked).map(c => c.key);
+    return (i: ItemJ) => cs.includes(this.settings.checklist.items[i.internalId]?.base || "false");
+  }
+
+  Sort(): ((a: ItemJ, b: ItemJ) => number) {
+    const compare = <T>(a?: number | string | T, b?: number | string | T, isAsc?: boolean) => {
+      const asc = isAsc ? 1 : -1;
+      if (b == null) { return -1 * asc; }
+      if (a == null) { return 1 * asc; }
+      if (typeof a === "string" && typeof b === "string") {
+        return this.nihongo.compareKana(a, b) * asc;
+      }
+      return (a < b ? -1 : 1) * asc;
+    };
+
+    const compare_ItemSource = (a?: Array<string>, b?: Array<string>) => {
+      if (b == null) { return -1; }
+      if (a == null) { return 1; }
+      for (let i = 0; i < a.length && i < b.length; i++) {
+        if (a[i] !== b[i]) {
+          return compare(this.t.ItemsSource(a[i]), this.t.ItemsSource(b[i]));
+        }
+      }
+      return a.length - b.length;
+    };
+
+    const isAsc = this.lastSort.direction === 'asc' ? 1 : -1;
+    switch (this.lastSort.active) {
+      case 'name': return (p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ) * isAsc;
+      case 'series': return (p, q) => compare(p.seriesTranslations?.japanese, q.seriesTranslations?.japanese) * isAsc;
+      case 'source': return (p, q) => compare_ItemSource(p.source, q.source) * isAsc;
+      case 'catalog': return (p, q) => compare(p.catalog, q.catalog) * isAsc;
+      default: return () => 0;
+    }
+  }
 
 
   IsNotLast(index: number, a?: Array<any>) {
@@ -325,3 +345,13 @@ export class ItemComponent implements OnInit {
 };
 
 
+// declare global {
+//   interface Array<T> {
+//     tap(interceptor: (t: T) => any): Array<T>;
+//   }
+// }
+
+// Array.prototype.tap = function (interceptor) {
+//   interceptor(this);
+//   return this;
+// };

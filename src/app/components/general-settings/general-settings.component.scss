@@ -1,0 +1,12 @@
+.checks{
+    display: flex;
+    flex-direction: column;
+}
+
+.IO>div{
+    display: grid;
+    grid-template-columns: auto auto;
+    textarea{
+        width: 70vw;
+    }
+}

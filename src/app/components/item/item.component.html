@@ -2,7 +2,8 @@
     <button mat-icon-button (click)="OpenSettings()">
         <mat-icon>settings</mat-icon>
     </button>
-    <mat-checkbox *ngFor="let s of settings.headers('items', true)" [(ngModel)]="s.enable" (change)="TableColumns()">
+    <mat-checkbox *ngFor="let s of settings.headers('items', true)" [(ngModel)]="s.enable"
+        (change)="TableColumns();settings.mayNeedToSave=true">
         {{s.name}}
     </mat-checkbox>
     <div class="space"></div>
@@ -36,7 +37,8 @@
             </button>
         </mat-form-field>
     </div>
-    <mat-checkbox [(ngModel)]="catalogForSale" (click)="Filter()">購入可のみ</mat-checkbox>
+    <app-checkbox-noop [checked]="catalogForSale" (click)="catalogForSale = !catalogForSale; Filter()">購入可のみ
+    </app-checkbox-noop>
     <button mat-button (click)="ToggleState(diystate, diy)">{{diy.state}}</button>
 </mat-toolbar>
 <!-- <mat-form-field>

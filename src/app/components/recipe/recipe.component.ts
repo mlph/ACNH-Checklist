@@ -83,6 +83,7 @@ export class RecipeComponent implements OnInit {
       check: (i: IRecipeJ) => {
         // i.checked = !i.checked;
         this.settings.checklist.recipes[i.internalId] = !this.settings.checklist.recipes[i.internalId];
+        this.settings.needToSave = true;
       },
       IsChecked: (i: IRecipeJ) => {
         return this.settings.checklist.recipes[i.internalId];
