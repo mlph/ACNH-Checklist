@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open --port 4301",
+    "deploy": "ng deploy --base-href=/ACNH-Checklist/",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
