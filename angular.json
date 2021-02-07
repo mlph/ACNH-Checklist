@@ -125,6 +125,10 @@
               "devServerTarget": "ACNH-Checklist:serve:production"
             }
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy",
+          "options": {}
         }
       }
     }
