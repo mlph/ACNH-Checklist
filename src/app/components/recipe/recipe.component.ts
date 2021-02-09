@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Sort } from '@angular/material/sort';
 import { Category } from 'animal-crossing/lib/types/Recipe';
 import { DataService, IRecipeJ } from 'src/app/services/data.service';
 import { NihongoService } from 'src/app/services/nihongo.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { TranslationService } from 'src/app/services/translation.service';
+import { SettingsComponent } from '../settings/settings.component';
 
 @Component({
   selector: 'app-recipe',
@@ -30,7 +32,6 @@ export class RecipeComponent implements OnInit {
 
 
   search = "";
-  private _search = "";
   col = ["name", "image", "source"];
 
   colDataSimple = [
@@ -58,6 +59,12 @@ export class RecipeComponent implements OnInit {
       id: "color",
       header: "カードの色",
       data: (i: IRecipeJ) => i.cardColor || "",
+      sort: true
+    },
+    {
+      id: "category",
+      header: "カテゴリ",
+      data: (i: IRecipeJ) => this.t.Category(i.category),
       sort: true
     },
   ];
@@ -112,7 +119,8 @@ export class RecipeComponent implements OnInit {
     private data: DataService,
     public settings: SettingsService,
     public t: TranslationService,
-    private nihongo: NihongoService
+    private nihongo: NihongoService,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -127,7 +135,9 @@ export class RecipeComponent implements OnInit {
     this.col = this.settings.headers("recipes").filter(i => i.enable).map(i => i.key);
   }
   OpenSettings() {
-    this.settings.open(this.settings.headers("recipes"));
+    // this.settings.open(this.settings.headers("recipes"));
+    this.dialog.open(SettingsComponent, { data: { header: "recipes", subj: this.settings.headerChanged } });
+
   }
 
 
@@ -154,7 +164,6 @@ export class RecipeComponent implements OnInit {
       return a.length - b.length;
     };
 
-    this._search = this.nihongo.toHiragana(this.search);
     // console.log(this._search);
 
     this.filteredData = this.raw
@@ -222,9 +231,9 @@ export class RecipeComponent implements OnInit {
     if (!this.search) {
       return true;
     }
+    return this.nihongo.match(d.nameJ, this.search);
 
-
-    return d.nameH.includes(this._search) || d.nameJ.toUpperCase().includes(this.search.toUpperCase());
+    // return d.nameH.includes(this._search) || d.nameJ.toUpperCase().includes(this.search.toUpperCase());
   };
 
 

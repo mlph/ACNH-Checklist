@@ -26,6 +26,7 @@ import { MatCardModule } from "@angular/material/card";
 import { CreatureComponent } from './components/creature/creature.component';
 import { GeneralSettingsComponent } from './components/general-settings/general-settings.component';
 import { CheckboxNoopComponent } from './components/parts/checkbox-noop/checkbox-noop.component';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -58,6 +59,7 @@ import { CheckboxNoopComponent } from './components/parts/checkbox-noop/checkbox
     DragDropModule,
     MatDialogModule,
     MatCardModule,
+    MatSelectModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

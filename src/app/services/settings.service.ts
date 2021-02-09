@@ -2,16 +2,18 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { items } from 'animal-crossing';
 import { Subject } from 'rxjs';
-import { SettingsComponent } from '../components/settings/settings.component';
+// import { SettingsComponent } from '../components/settings/settings.component';
 
 //@ts-ignore
 import * as cjson from 'compressed-json';
+import { moveItemInArray } from '@angular/cdk/drag-drop';
 
 const LSkey = "acnh_checklist";
 
 const headersDefault = {
   items: [
     { name: "チェック", key: "check", enable: true, toggleSwitch: false },
+    { name: "カテゴリ", key: "category", enable: false, toggleSwitch: true },
     { name: "名前", key: "name", enable: true, toggleSwitch: false },
     { name: "画像", key: "image", enable: false, toggleSwitch: true },
     { name: "入手手段", key: "source", enable: true, toggleSwitch: false },
@@ -23,6 +25,7 @@ const headersDefault = {
   ],
   recipes: [
     { name: "チェック", key: "check", enable: true, toggleSwitch: false },
+    { name: "カテゴリ", key: "category", enable: false, toggleSwitch: true },
     { name: "名前", key: "name", enable: true, toggleSwitch: false },
     { name: "画像", key: "image", enable: false, toggleSwitch: true },
     { name: "入手手段", key: "source", enable: true, toggleSwitch: false },
@@ -33,6 +36,7 @@ const headersDefault = {
   ],
   creatures: [
     { name: "チェック", key: "check", enable: true, toggleSwitch: false },
+    { name: "カテゴリ", key: "category", enable: false, toggleSwitch: true },
     { name: "Id", key: "id", enable: true, toggleSwitch: false },
     { name: "名前", key: "name", enable: true, toggleSwitch: false },
     { name: "アイコン", key: "imgIcon", enable: false, toggleSwitch: true },
@@ -61,7 +65,8 @@ export class SettingsService {
   generals = {
     materialImage: true,
     // materialKanji: false,
-    clickRowCheck: false
+    clickRowCheck: false,
+    hemisphere_north: true
   };
 
   checklist: {
@@ -101,9 +106,9 @@ export class SettingsService {
   }
 
 
-  open(header: HeaderSetting[]) {
-    this.dialog.open(SettingsComponent, { data: { headers: header, subj: this.headerChanged } });
-  }
+  // open(header: HeaderSetting[]) {
+  //   this.dialog.open(SettingsComponent, { data: { headers: header, subj: this.headerChanged } });
+  // }
 
   stringify() {
     return JSON.stringify(
@@ -128,6 +133,7 @@ export class SettingsService {
   save() {
     localStorage.setItem(LSkey, this.stringify());
     this.needToSave = false;
+    this.mayNeedToSave = false;
   }
 
   load(data: string) {
@@ -140,8 +146,34 @@ export class SettingsService {
     this.checklist.items = this.checklist.items || {};
     this.checklist.recipes = this.checklist.recipes || {};
     this.checklist.creatures = this.checklist.creatures || {};
+
+    const def = (h: HeaderSetting) => ({
+      enable: false,
+      key: h.key,
+      name: h.name,
+      toggleSwitch: false
+    });
+
+    headersDefault.items.forEach(h => {
+      if (!this._headers.items?.find(_ => _.key === h.key)) {
+        this._headers.items?.push(def(h));
+      }
+    });
+    headersDefault.recipes.forEach(h => {
+      if (!this._headers.recipes?.find(_ => _.key === h.key)) {
+        this._headers.recipes?.push(def(h));
+      }
+    });
+    headersDefault.creatures.forEach(h => {
+      if (!this._headers.creatures?.find(_ => _.key === h.key)) {
+        this._headers.creatures?.push(def(h));
+      }
+    });
   }
 
+  moveItemInArray(header: "items" | "recipes" | "creatures", previousIndex: number, currentIndex: number) {
+    moveItemInArray(this._headers[header]!, previousIndex, currentIndex);
+  }
 }
 
 export type threeState = "true" | "false" | "partial";

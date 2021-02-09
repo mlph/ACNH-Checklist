@@ -7,6 +7,8 @@ import { TranslationService } from 'src/app/services/translation.service';
 
 import { NihongoService } from 'src/app/services/nihongo.service';
 import { MatCheckboxDefaultOptions, MAT_CHECKBOX_DEFAULT_OPTIONS } from '@angular/material/checkbox';
+import { MatDialog } from '@angular/material/dialog';
+import { SettingsComponent } from '../settings/settings.component';
 @Component({
   selector: 'app-item',
   templateUrl: './item.component.html',
@@ -36,7 +38,6 @@ export class ItemComponent implements OnInit {
   ];
 
   search = "";
-  private _search = "";
   col = ["name", "source", "catalog"];
 
   colDataSimple = [
@@ -69,7 +70,13 @@ export class ItemComponent implements OnInit {
       header: "シリーズ",
       data: (i: ItemJ) => i.seriesTranslations?.japanese || i.series || "",
       sort: true
-    }
+    },
+    {
+      id: "category",
+      header: "カテゴリ",
+      data: (i: ItemJ) => this.t.Category(i.sourceSheet),
+      sort: true
+    },
   ];
 
   colData = {
@@ -187,7 +194,8 @@ export class ItemComponent implements OnInit {
     private data: DataService,
     public settings: SettingsService,
     public t: TranslationService,
-    private nihongo: NihongoService
+    private nihongo: NihongoService,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -202,13 +210,14 @@ export class ItemComponent implements OnInit {
     this.col = this.settings.headers("items").filter(i => i.enable).map(i => i.key);
   }
   OpenSettings() {
-    this.settings.open(this.settings.headers("items"));
+    // this.settings.open(this.settings.headers("items"));
+    this.dialog.open(SettingsComponent, { data: { header: "items", subj: this.settings.headerChanged } });
   }
 
 
   Filter() {
 
-    this._search = this.nihongo.toHiragana(this.search);
+    // console.log(this._search);
     // console.log(this._search);
 
     // const t = Date.now()
@@ -272,8 +281,17 @@ export class ItemComponent implements OnInit {
     if (!this.search) {
       return true;
     }
+    return this.nihongo.match(d.nameJ, this.search);
+    // if (m1 === "true") {
+    //   return true;
+    // }
+    // // console.log(m1, d.nameH, this._search)
+    // if (m1 === "never") {
+    //   return false;
+    // }
 
-    return d.nameH.includes(this._search) || d.nameJ.toUpperCase().includes(this.search.toUpperCase());
+    // return this.nihongo.match(d.nameJ.toUpperCase(), this.search.toUpperCase()) === "true";
+    // return d.nameH.includes(this._search) || d.nameJ.toUpperCase().includes(this.search.toUpperCase());
   };
 
   FilterCheck(): ((i: ItemJ) => boolean) {

@@ -1,5 +1,5 @@
 <div cdkDropList (cdkDropListDropped)="drop($event)">
-    <mat-card *ngFor="let t of data.headers" cdkDrag>
+    <mat-card *ngFor="let t of headers" cdkDrag>
         <mat-card-content>
             {{t.name}}
             <mat-checkbox [(ngModel)]="t.enable" (ngModelChange)="check()">表示</mat-checkbox>

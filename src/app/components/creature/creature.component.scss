@@ -36,6 +36,11 @@ mat-toolbar{
         font-size: small;
         color: gray;
     }
+
+    .month{
+        font-size: small;
+        line-height: normal;
+    }
 }
 
 .content{
@@ -78,6 +83,7 @@ mat-table{
         display: flex;
     }
 
+
     .month{
         display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -94,6 +100,12 @@ mat-table{
         .active{
             background-color: yellowgreen;
             color: black;
+        }
+        .current{
+            background-color: rgb(247, 194, 187);
+        }
+        .current.active{
+            background-color: rgb(202, 109, 86);
         }
     }
     .time{
@@ -114,10 +126,19 @@ mat-table{
             background-color: yellowgreen;
             color: black;
         }
+        .current{
+            background-color: rgb(247, 194, 187);
+        }
+        .current.active{
+            background-color: rgb(202, 109, 86);
+        }
     }
 
     .c.property{
         display: grid;
-        grid-template-columns: repeat(2, auto);
+        grid-template-columns: auto 1fr;
+        .key{
+            margin-right: 1em;
+        }
     }
 }

@@ -5,6 +5,7 @@ import { TranslationService } from './translation.service';
 
 import { NihongoService } from './nihongo.service';
 import { SettingsService, threeState } from './settings.service';
+import { Creature } from 'animal-crossing/lib/types/Creature';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,11 @@ export class DataService {
     const Process_Item = (i: Item) => {
       const r = i as ItemJ;
       r.nameJ = i.translations?.japanese || i.name;
+      if(i.sourceSheet === Category.Art){
+        if(i.genuine === false){
+          r.nameJ = r.nameJ + "(にせもの)"
+        }
+      }
       if (!i.translations || !i.translations.japanese) {
         // if (i.sourceSheet !== Category.MessageCards) {
         //   console.log(r.name);
@@ -51,7 +57,7 @@ export class DataService {
         };
         r.nameJ = t[r.name] || r.name;
       }
-      r.nameH = this.nihongo.toHiragana(r.nameJ);
+      // r.nameH = this.nihongo.toHiragana(r.nameJ);
       const id = (() => {
         if (r.internalId != null) {
           return r.internalId;
@@ -77,14 +83,14 @@ export class DataService {
     const Process_Recipe = (i: IRecipe) => {
       const r = i as IRecipeJ;
       r.nameJ = i.translations?.japanese || i.name;
-      r.nameH = this.nihongo.toHiragana(r.nameJ);
+      // r.nameH = this.nihongo.toHiragana(r.nameJ);
       // r.checked = !!this.settings.checklist.recipes[r.internalId];
       return r;
     };
     const Process_Creature = (i: ICreature) => {
       const r = i as ICreatureJ;
       r.nameJ = i.translations.japanese;
-      r.nameH = this.nihongo.toHiragana(r.nameJ);
+      // r.nameH = this.nihongo.toHiragana(r.nameJ);
       // r.checked = !!this.settings.checklist.recipes[r.internalId];
       return r;
     };
@@ -129,9 +135,16 @@ export class DataService {
     // console.log(creatures.length, creatures[0]);
     // console.log(creatures.filter(c=>typeof c.hemispheres.north.timeArray[0] !== "number"))
     // console.log(items.filter(i=>i.versionAdded === Version.The170))
+    // console.log(items.filter(i=>i.genuine))
   }
 
-
+  hemisphere(c: Creature) {
+    if (this.settings.generals.hemisphere_north) {
+      return c.hemispheres.north;
+    } else {
+      return c.hemispheres.south;
+    }
+  }
 
   /**
    * @description 非破壊的
@@ -161,7 +174,7 @@ export class DataService {
 
 export type ItemJ = Item & {
   nameJ: string;
-  nameH: string;
+  // nameH: string;
   internalId: number;
   // checked: {
   //   base: threeState;
@@ -173,12 +186,12 @@ export type ItemJ = Item & {
 };
 export type IRecipeJ = IRecipe & {
   nameJ: string;
-  nameH: string;
+  // nameH: string;
   // checked: boolean;
 };
 export type ICreatureJ = ICreature & {
   nameJ: string;
-  nameH: string;
+  // nameH: string;
   // checked: boolean;
   // discriptionJ: string;
   // catchPhraseJ: string;

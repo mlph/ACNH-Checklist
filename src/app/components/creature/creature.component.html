@@ -37,7 +37,31 @@
             </button>
         </mat-form-field>
     </div>
-
+    <div>
+        <!-- <div class="month">
+            <div *ngFor="let i of _12" [class.active]="filt.month[i]" (mousedown)="filt.month[i]= !filt.month[i]">{{i}}月
+            </div>
+        </div> -->
+        <!-- <button mat-raised-button [matMenuTriggerFor]="month">月</button>
+        <mat-menu #month>
+        </mat-menu> -->
+        <!-- <div style="font-size: small;border: 1px solid black;">1月</div> -->
+        <mat-form-field>
+            <mat-select [(ngModel)]="month" (ngModelChange)="Filter()">
+                <mat-option [value]="-1">全て</mat-option>
+                <mat-option *ngFor="let i of _12" [value]="i">{{i}}月</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-select [(ngModel)]="time" (ngModelChange)="Filter()">
+                <mat-option [value]="-1">全て</mat-option>
+                <mat-option *ngFor="let i of _24" [value]="i">{{i}}時台</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-checkbox [(ngModel)]="highlightCurrentTime">現在の月と時刻をハイライト</mat-checkbox>
+    </div>
 </mat-toolbar>
 <!-- <mat-form-field>
     <input matInput [(ngModel)]="page" type="number" (change)="Filter()">
@@ -101,16 +125,18 @@
             <mat-cell class="c period" *matCellDef="let element">
                 <div>
                     <div class="month">
-                        <div *ngFor="let i of _12" [class.active]="element.hemispheres.north.monthsArray.includes(i)">
+                        <div *ngFor="let i of _12" [class.active]="colData.period.hem(element).monthsArray.includes(i)"
+                            [class.current]="highlightCurrentTime && IsNow_m(i)">
                             {{i}}月
                         </div>
                     </div>
                     <div>
                         <div class="time">
                             <div *ngFor="let i of _24" [class]="'t_'+(i+1)"
-                                [class.active]="colData.period.time(element).includes(i)"></div>
+                                [class.active]="colData.period.time(element).includes(i)"
+                                [class.current]="highlightCurrentTime && IsNow_t(i)"></div>
                         </div>
-                        <div class="time_string" *ngFor="let t of element.hemispheres.north.time">{{t}}</div>
+                        <div class="time_string" *ngFor="let t of colData.period.hem(element).time">{{t}}</div>
                     </div>
                 </div>
             </mat-cell>
@@ -120,7 +146,7 @@
             <mat-header-cell class="h property" *matHeaderCellDef>特徴</mat-header-cell>
             <mat-cell class="c property" *matCellDef="let element">
                 <ng-container *ngFor="let p of colData.property.data(element)">
-                    <div>{{p.key}}</div>
+                    <div class="key">{{p.key}}</div>
                     <div>{{p.value}}</div>
                 </ng-container>
             </mat-cell>

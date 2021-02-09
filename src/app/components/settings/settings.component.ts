@@ -11,15 +11,17 @@ import { SettingsService, HeaderSetting } from 'src/app/services/settings.servic
 })
 export class SettingsComponent implements OnInit {
 
-
+  headers!: HeaderSetting[];
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { headers: HeaderSetting[], subj: Subject<never>; },
+    @Inject(MAT_DIALOG_DATA) public data: { header: "items" | "recipes" | "creatures", subj: Subject<never>; },
     private dialogref: MatDialogRef<SettingsComponent>,
-    // private setting: SettingsService
+    private setting: SettingsService
   ) { }
 
   ngOnInit(): void {
+    this.headers = this.setting.headers(this.data.header);
+    // console.log(this.data.header, this.headers);
   }
 
   test(a: any) {
@@ -31,12 +33,14 @@ export class SettingsComponent implements OnInit {
     this.dialogref.close();
   }
 
-  check(){
+  check() {
     this.data.subj.next();
   }
 
   drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.data.headers, event.previousIndex, event.currentIndex);
+    // console.log(event.previousIndex, event.currentIndex);
+    this.setting.moveItemInArray(this.data.header, event.previousIndex, event.currentIndex);
+    this.headers = this.setting.headers(this.data.header);
     this.data.subj.next();
   }
 }

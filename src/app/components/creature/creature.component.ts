@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Sort } from '@angular/material/sort';
 import { CreatureSourceSheet } from 'animal-crossing/lib/types/Creature';
 import { DataService, ICreatureJ } from 'src/app/services/data.service';
 import { NihongoService } from 'src/app/services/nihongo.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { TranslationService } from 'src/app/services/translation.service';
+import { SettingsComponent } from '../settings/settings.component';
 
 @Component({
   selector: 'app-creature',
@@ -25,9 +27,18 @@ export class CreatureComponent implements OnInit {
     { checked: true, icon: "check_box" },
   ];
 
+  // filt = {
+  //   month: [],
+  //   time: []
+  // };
+
+  month = -1;
+  time = -1;
+
+  highlightCurrentTime = true;
+
 
   search = "";
-  private _search = "";
   col = ["name", "source", "catalog"];
 
   colDataSimple = [
@@ -50,6 +61,12 @@ export class CreatureComponent implements OnInit {
       header: "json",
       data: (i: ICreatureJ) => JSON.stringify(i, undefined, 2),
       sort: false
+    },
+    {
+      id: "category",
+      header: "カテゴリ",
+      data: (i: ICreatureJ) => this.t.CreatureSourceSheet(i.sourceSheet),
+      sort: true
     },
   ];
 
@@ -87,9 +104,10 @@ export class CreatureComponent implements OnInit {
       id: "period",
       // "hemispheres.north.monthsArray": "",
       // ".hemispheres.north.time": ""
+      hem: (i: ICreatureJ) => this.data.hemisphere(i),
       time: (i: ICreatureJ) => {
-        const t = i.hemispheres.north.timeArray;
-        if (typeof i.hemispheres.north.timeArray[0] === "number") {
+        const t = this.data.hemisphere(i).timeArray;
+        if (typeof this.data.hemisphere(i).timeArray[0] === "number") {
           return t as Array<number>;
         } else {
           return ([] as number[]).concat(...(t as number[][]));
@@ -135,7 +153,8 @@ export class CreatureComponent implements OnInit {
     private data: DataService,
     public settings: SettingsService,
     public t: TranslationService,
-    private nihongo: NihongoService
+    private nihongo: NihongoService,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -150,34 +169,37 @@ export class CreatureComponent implements OnInit {
     this.col = this.settings.headers("creatures").filter(i => i.enable).map(i => i.key);
   }
   OpenSettings() {
-    this.settings.open(this.settings.headers("creatures"));
+    // this.settings.open(this.settings.headers("creatures"));
+    this.dialog.open(SettingsComponent, { data: { header: "creatures", subj: this.settings.headerChanged } });
+
   }
 
 
   Filter() {
-    const compare = <T>(a?: number | string | T, b?: number | string | T, isAsc?: boolean) => {
-      const asc = isAsc ? 1 : -1;
-      if (b == null) { return -1 * asc; }
-      if (a == null) { return 1 * asc; }
+    const compare = <T>(a?: number | string | T, b?: number | string | T) => {
+      if (b == null) { return -1; }
+      if (a == null) { return 1; }
       if (typeof a === "string" && typeof b === "string") {
-        return this.nihongo.compareKana(a, b) * asc;
+        return this.nihongo.compareKana(a, b);
       }
-      return (a < b ? -1 : 1) * asc;
+      return (a < b ? -1 : 1);
     };
 
-    const compare_ItemSource = (a?: Array<string>, b?: Array<string>, isAsc?: boolean) => {
-      const asc = isAsc ? 1 : -1;
-      if (b == null) { return -1 * asc; }
-      if (a == null) { return 1 * asc; }
-      for (let i = 0; i < a.length && i < b.length; i++) {
-        if (a[i] !== b[i]) {
-          return compare(this.t.ItemsSource(a[i]), this.t.ItemsSource(b[i])) * asc;
+    const compare_id = (a: ICreatureJ, b: ICreatureJ) => {
+      const category = (c: ICreatureJ) => {
+        switch (c.sourceSheet) {
+          case CreatureSourceSheet.Insects: return 0;
+          case CreatureSourceSheet.Fish: return 1;
+          case CreatureSourceSheet.SeaCreatures: return 2;
         }
+      };
+      const sub = category(a) - category(b);
+      if (sub !== 0) {
+        return sub;
       }
-      return a.length - b.length;
+      return a.num - b.num;
     };
 
-    this._search = this.nihongo.toHiragana(this.search);
     // console.log(this._search);
 
     this.filteredData = this.raw
@@ -189,11 +211,19 @@ export class CreatureComponent implements OnInit {
         }
       })
       .filter(this.SearchWord)
+      .filter(d => {
+        if (this.month === -1) { return true; }
+        return this.data.hemisphere(d).monthsArray.includes(this.month);
+      })
+      .filter(d => {
+        if (this.time === -1) { return true; }
+        return this.data.hemisphere(d).timeArray.includes(this.time);
+      })
       .sort((a, b) => {
-        const isAsc = this.lastSort.direction === 'asc';
+        const isAsc = this.lastSort.direction === 'asc' ? 1 : -1;
         switch (this.lastSort.active) {
-          case 'name': return compare(a.nameJ, b.nameJ, isAsc);
-          case 'id': return compare(a.num, b.num, isAsc);
+          case 'name': return compare(a.nameJ, b.nameJ) * isAsc;
+          case 'id': return compare_id(a, b) * isAsc;
           // case 'source': return compare_ItemSource(a.source, b.source, isAsc);
           default: return 0;
         }
@@ -234,9 +264,7 @@ export class CreatureComponent implements OnInit {
     if (!this.search) {
       return true;
     }
-
-
-    return d.nameH.includes(this._search) || d.nameJ.toUpperCase().includes(this.search.toUpperCase());
+    return this.nihongo.match(d.nameJ, this.search);
   };
 
 
@@ -258,5 +286,13 @@ export class CreatureComponent implements OnInit {
     if (this.settings.generals.clickRowCheck) {
       this.colData.check.check(c);
     }
+  }
+
+  IsNow_m(m: number) {
+    return (new Date()).getMonth() + 1 === m;
+  }
+
+  IsNow_t(t: number) {
+    return (new Date()).getHours() === t;
   }
 }
