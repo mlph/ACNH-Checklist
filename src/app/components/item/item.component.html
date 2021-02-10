@@ -40,6 +40,11 @@
     <app-checkbox-noop [checked]="catalogForSale" (click)="catalogForSale = !catalogForSale; Filter()">購入可のみ
     </app-checkbox-noop>
     <button mat-button (click)="ToggleState(diystate, diy)">{{diy.state}}</button>
+    <div class="space"></div>
+    <div>{{scrollText}}</div>
+    <button mat-icon-button (keyup)="scroller($event)">
+        <mat-icon>find_in_page</mat-icon>
+    </button>
 </mat-toolbar>
 <!-- <mat-form-field>
     <input matInput [(ngModel)]="page" type="number" (change)="Filter()">
@@ -50,7 +55,7 @@
 
 <!-- {{(page - 1) * row + 1}} - {{(page - 1) * row + showingData.length}} / {{filteredData.length}} / {{raw.length}} -->
 
-<div class="contents">
+<div class="contents" #maincontents>
 
     <div>
         <button mat-icon-button (click)="CategoryAll(categories1)">
@@ -178,6 +183,6 @@
         </ng-container>
 
         <mat-header-row *matHeaderRowDef="col"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: col;" (click)="clickRow(row)"></mat-row>
+        <mat-row #matrow *matRowDef="let row; columns: col;let i = index" (click)="clickRow(row)" [class.scrolled]="scrollIndex === i"></mat-row>
     </mat-table>
 </div>

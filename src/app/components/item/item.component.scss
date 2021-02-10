@@ -50,6 +50,16 @@ mat-table{
     //         width: 3em;
     //     }
     // }
+    .scrolled{
+        // background-color: red;
+        animation: scrolled_background 2s infinite;
+
+        @keyframes scrolled_background {
+            0% {background-color: transparent;}
+            50% {background-color: pink;}
+            100% {background-color: transparent;}
+        }
+    }
     .image{
         display: flex;
         max-width: 400px;

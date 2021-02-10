@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostBinding, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Sort } from '@angular/material/sort';
 import { Catalog, Category, Item, VariationElement } from 'animal-crossing/lib/types/Item';
 import { DataService, ItemJ, variantId } from 'src/app/services/data.service';
@@ -9,6 +9,9 @@ import { NihongoService } from 'src/app/services/nihongo.service';
 import { MatCheckboxDefaultOptions, MAT_CHECKBOX_DEFAULT_OPTIONS } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { SettingsComponent } from '../settings/settings.component';
+import { MatRow } from '@angular/material/table';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, switchMap, tap } from "rxjs/operators";
 @Component({
   selector: 'app-item',
   templateUrl: './item.component.html',
@@ -17,7 +20,7 @@ import { SettingsComponent } from '../settings/settings.component';
   //   { provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: { clickAction: 'noop' } as MatCheckboxDefaultOptions }
   // ]
 })
-export class ItemComponent implements OnInit {
+export class ItemComponent implements OnInit, OnDestroy {
 
 
   raw = this.data.data;
@@ -190,13 +193,24 @@ export class ItemComponent implements OnInit {
 
   categories = this.categories1.concat(this.categories2).concat(this.categories3);
 
+  scrollSubject = new Subject<string>();
+  subsc!: Subscription;
+  @ViewChildren(MatRow, { read: ElementRef }) matrow?: QueryList<ElementRef>;
+  // selected?: ElementRef;
+  scrollIndex = -1;
+  scrollText = "";
+  scrollTextReset = true;
+  @ViewChild("maincontents", { read: ElementRef }) maincontents!: ElementRef;
+
   constructor(
     private data: DataService,
     public settings: SettingsService,
     public t: TranslationService,
     private nihongo: NihongoService,
     private dialog: MatDialog
-  ) { }
+  ) {
+    // this.tabIndex = "0";
+  }
 
   ngOnInit(): void {
     this.Filter();
@@ -204,6 +218,12 @@ export class ItemComponent implements OnInit {
       this.TableColumns();
     });
     this.TableColumns();
+
+    this.ScrollerInit();
+  }
+
+  ngOnDestroy() {
+    this.subsc.unsubscribe();
   }
 
   TableColumns() {
@@ -338,6 +358,69 @@ export class ItemComponent implements OnInit {
   }
 
 
+  // @HostBinding("tabIndex") tabIndex!: string;
+  // @HostListener("keyup", ["$event"]) onkeyUp(event: KeyboardEvent) {
+  // }
+
+  ScrollerInit() {
+    this.subsc = this.scrollSubject.pipe(
+      tap(s => {
+        if (this.scrollTextReset) {
+          this.scrollText = "";
+        }
+        this.scrollText = this.scrollText + s;
+
+        this.ScrollToTargetIndex(
+          this.showingData.findIndex(i => this.nihongo.toHiragana(i.nameJ).startsWith(this.nihongo.toHiragana(this.scrollText)))
+        );
+        this.scrollTextReset = false;
+      }),
+      debounceTime(2000),
+      tap(() => this.scrollTextReset = true)
+    ).subscribe(() => {
+      // console.log(this.scrollText);
+    });
+  }
+
+  scroller(event: KeyboardEvent) {
+    if (event.key.length === 1) {
+      this.scrollSubject.next(event.key);
+    } else if (event.key === "Enter") {
+
+    } else if (event.key === "PageUp") {
+      this.ScrollToTargetIndex(clamp(this.scrollIndex - 10, 0, this.showingData.length));
+    } else if (event.key === "PageDown") {
+      this.ScrollToTargetIndex(clamp(this.scrollIndex + 10, 0, this.showingData.length));
+    } else if (event.key === "Home") {
+      this.ScrollToTargetIndex(0);
+    } else if (event.key === "End") {
+      this.ScrollToTargetIndex(this.showingData.length - 1);
+    } else if (event.key === "ArrowUp") {
+      this.ScrollToTargetIndex(clamp(this.scrollIndex - 1, 0, this.showingData.length));
+    } else if (event.key === "ArrowLeft") {
+      // this.ScrollToTargetIndex( clamp(this.scrollIndex - 10, 0, this.showingData.length));
+    } else if (event.key === "ArrowDown") {
+      this.ScrollToTargetIndex(clamp(this.scrollIndex + 1, 0, this.showingData.length));
+    } else if (event.key === "ArrowRight") {
+      // this.ScrollToTargetIndex( clamp(this.scrollIndex - 10, 0, this.showingData.length));
+    } else {
+      console.log(this.maincontents);
+      console.log(event.key);
+    }
+
+  }
+
+  ScrollToTargetIndex(index: number) {
+    this.scrollIndex = index;
+    if (this.matrow) {
+      if (this.scrollIndex === 0) {
+        this.maincontents.nativeElement.scroll(0, 0);
+      } else if (this.scrollIndex > 0) {
+        this.matrow.toArray()[this.scrollIndex].nativeElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  }
+
   IsNotLast(index: number, a?: Array<any>) {
     if (a && a.length > index + 1) {
       return true;
@@ -362,7 +445,15 @@ export class ItemComponent implements OnInit {
 
 };
 
-
+const clamp = (a: number, min: number, max: number) => {
+  if (a < min) {
+    return min;
+  }
+  if (a > max) {
+    return max;
+  }
+  return a;
+};;
 // declare global {
 //   interface Array<T> {
 //     tap(interceptor: (t: T) => any): Array<T>;
