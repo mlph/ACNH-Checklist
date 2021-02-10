@@ -7,6 +7,8 @@ import { Subject } from 'rxjs';
 //@ts-ignore
 import * as cjson from 'compressed-json';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
+import { Category, Item } from 'animal-crossing/lib/types/Item';
+import { ItemJ } from './data.service';
 
 const LSkey = "acnh_checklist";
 
@@ -69,19 +71,33 @@ export class SettingsService {
     hemisphere_north: true
   };
 
+  // checklist: {
+  //   items: {
+  //     [internalId: number]: {
+  //       base: threeState;
+  //       variants: {
+  //         [variantId: string]: boolean;
+  //       };
+  //     };
+  //   };
+  //   recipes: { [internalId: number]: boolean; };
+  //   creatures: { [internalId: number]: boolean; };
+  // } = { items: {}, recipes: {}, creatures: {} };
+
   checklist: {
     items: {
-      [internalId: number]: {
-        base: threeState;
-        variants: {
-          [variantId: string]: boolean;
+      [category in Category]?: {
+        [internalId: number]: {
+          base: threeState;
+          variants: {
+            [variantId: string]: boolean;
+          };
         };
       };
     };
     recipes: { [internalId: number]: boolean; };
     creatures: { [internalId: number]: boolean; };
   } = { items: {}, recipes: {}, creatures: {} };
-
 
 
   headerChanged = new Subject<never>();
@@ -169,6 +185,14 @@ export class SettingsService {
         this._headers.creatures?.push(def(h));
       }
     });
+
+  }
+
+  itemCheckList(i: ItemJ) {
+    if (!this.checklist.items[i.sourceSheet]) {
+      this.checklist.items[i.sourceSheet] = {};
+    }
+    return this.checklist.items[i.sourceSheet]!;
   }
 
   moveItemInArray(header: "items" | "recipes" | "creatures", previousIndex: number, currentIndex: number) {

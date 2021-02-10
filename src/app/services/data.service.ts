@@ -129,6 +129,22 @@ export class DataService {
 
     // a.forEach(s=>console.log(translations.find(t=>t.sourceSheet === s)))
 
+    // const a:Item[][] = []
+    // items
+    // .forEach(i=>{
+    //   if(i.internalId != null){
+    //     if(a[i.internalId]){
+    //       a[i.internalId].push(i)
+    //     }else{
+    //       a[i.internalId] = [i]
+    //     }
+    //   }
+    // })
+
+    // console.log(a.filter(i=>i.length > 1).filter(i=>i[0].sourceSheet === i[1].sourceSheet))
+
+    // console.log(items.filter(i=>!i.uniqueEntryId).filter(i=>i.villagerEquippable === undefined).filter)
+
     // console.log(seasonsAndEvents);
     // console.log(items.filter(i => !i.internalId && !i.translations?.id));
     // console.log(recipes.filter(i => !i.internalId ));

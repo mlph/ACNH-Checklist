@@ -108,16 +108,16 @@ export class ItemComponent implements OnInit {
       check: (i: ItemJ, v: VariationElement) => {
 
         this.settings.needToSave = true;
-        this.settings.checklist.items[i.internalId] = this.settings.checklist.items[i.internalId] || { base: "false", variants: {} };
-        this.settings.checklist.items[i.internalId].variants[variantId(v)] = !this.vari_IsChecked(i, v);
+        this.settings.itemCheckList(i)[i.internalId] = this.settings.itemCheckList(i)[i.internalId] || { base: "false", variants: {} };
+        this.settings.itemCheckList(i)[i.internalId].variants[variantId(v)] = !this.vari_IsChecked(i, v);
 
         if (i.variations) {
           if (i.variations.every(va => this.vari_IsChecked(i, va))) {
-            this.settings.checklist.items[i.internalId].base = "true";
+            this.settings.itemCheckList(i)[i.internalId].base = "true";
           } else if (i.variations.every(va => !this.vari_IsChecked(i, va))) {
-            this.settings.checklist.items[i.internalId].base = "false";
+            this.settings.itemCheckList(i)[i.internalId].base = "false";
           } else {
-            this.settings.checklist.items[i.internalId].base = "partial";
+            this.settings.itemCheckList(i)[i.internalId].base = "partial";
           }
         }
       }
@@ -139,13 +139,13 @@ export class ItemComponent implements OnInit {
         if (i.variations && i.variations.length > 0) {
         } else {
           this.settings.needToSave = true;
-          this.settings.checklist.items[i.internalId] = this.settings.checklist.items[i.internalId] || { base: "false" };
-          this.settings.checklist.items[i.internalId].base = this.settings.checklist.items[i.internalId].base === "false" ? "true" : "false";
+          this.settings.itemCheckList(i)[i.internalId] = this.settings.itemCheckList(i)[i.internalId] || { base: "false" };
+          this.settings.itemCheckList(i)[i.internalId].base = this.settings.itemCheckList(i)[i.internalId].base === "false" ? "true" : "false";
         }
       },
       // isChecked: (i: ItemJ) => i.checked.base === "true",
-      IsChecked: (i: ItemJ) => this.settings.checklist.items[i.internalId]?.base === "true",
-      IsPartial: (i: ItemJ) => this.settings.checklist.items[i.internalId]?.base === "partial"
+      IsChecked: (i: ItemJ) => this.settings.itemCheckList(i)[i.internalId]?.base === "true",
+      IsPartial: (i: ItemJ) => this.settings.itemCheckList(i)[i.internalId]?.base === "partial"
     },
     material: {
       id: "material",
@@ -302,7 +302,7 @@ export class ItemComponent implements OnInit {
       return () => false;
     }
     const cs = this.checks.filter(c => c.checked).map(c => c.key);
-    return (i: ItemJ) => cs.includes(this.settings.checklist.items[i.internalId]?.base || "false");
+    return (i: ItemJ) => cs.includes(this.settings.itemCheckList(i)[i.internalId]?.base || "false");
   }
 
   Sort(): ((a: ItemJ, b: ItemJ) => number) {
@@ -352,7 +352,7 @@ export class ItemComponent implements OnInit {
     this.Filter();
   }
 
-  vari_IsChecked = (i: ItemJ, v: VariationElement) => this.settings.checklist.items[i.internalId]?.variants[variantId(v)];
+  vari_IsChecked = (i: ItemJ, v: VariationElement) => this.settings.itemCheckList(i)[i.internalId]?.variants[variantId(v)];
 
   clickRow(c: ItemJ) {
     if (this.settings.generals.clickRowCheck) {
