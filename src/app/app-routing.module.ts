@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { RecipeComponent } from './components/recipe/recipe.component';
-import { ItemComponent } from './components/item/item.component';
-import { CreatureComponent } from './components/creature/creature.component';
+import { RecipeComponent } from './components/table/recipe/recipe.component';
+import { ItemComponent } from './components/table/item/item.component';
+import { CreatureComponent } from './components/table/creature/creature.component';
 
 const routes: Routes = [
   { path: "item", component: ItemComponent },

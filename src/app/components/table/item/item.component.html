@@ -13,13 +13,13 @@
     </div>
     <div>
         <mat-form-field class="page">
-            <input matInput [(ngModel)]="page" type="number" min="1" (change)="Filter()">
+            <input matInput [(ngModel)]="page" type="number" min="1" (change)="PageChange()">
         </mat-form-field>
         <span class="suffix">page</span>
     </div>
     <div>
         <mat-form-field class="row">
-            <input matInput [(ngModel)]="row" type="number" min="1" (change)="Filter()">
+            <input matInput [(ngModel)]="row" type="number" min="1" (change)="PageChange()">
         </mat-form-field>
         <span class="suffix">items per row</span>
     </div>
@@ -31,8 +31,8 @@
     </button>
     <div>
         <mat-form-field>
-            <input matInput [(ngModel)]="search" (change)="Filter()">
-            <button mat-icon-button matSuffix (click)="search = '';Filter()">
+            <input matInput [(ngModel)]="searchText" (change)="Filter()">
+            <button mat-icon-button matSuffix (click)="searchText = '';Filter()">
                 <mat-icon>close</mat-icon>
             </button>
         </mat-form-field>
@@ -42,20 +42,13 @@
     <button mat-button (click)="ToggleState(diystate, diy)">{{diy.state}}</button>
     <div class="space"></div>
     <div>{{scrollText}}</div>
-    <button mat-icon-button (keyup)="scroller($event)">
+    <button mat-icon-button (keyup)="scroller($event)" (focus)="focus()" (blur)="unfocus()"
+        [class.focused]="scrollerFocused">
         <mat-icon>find_in_page</mat-icon>
     </button>
 </mat-toolbar>
-<!-- <mat-form-field>
-    <input matInput [(ngModel)]="page" type="number" (change)="Filter()">
-</mat-form-field>
-<mat-form-field>
-    <input matInput [(ngModel)]="row" type="number" (change)="Filter()">
-</mat-form-field> -->
 
-<!-- {{(page - 1) * row + 1}} - {{(page - 1) * row + showingData.length}} / {{filteredData.length}} / {{raw.length}} -->
-
-<div class="contents" #maincontents>
+<div class="contents">
 
     <div>
         <button mat-icon-button (click)="CategoryAll(categories1)">
@@ -81,17 +74,17 @@
 
 
 
-    <mat-table [dataSource]="showingData" matSort (matSortChange)="ReSort($event)" matSortActive="name"
+    <mat-table [dataSource]="showingData" matSort (matSortChange)="SortOrderChange($event)" matSortActive="name"
         matSortDirection="asc">
         <ng-container *ngFor="let c of colDataSimple" [matColumnDef]="c.id">
             <ng-container *ngIf="c.sort;else nosort">
-                <mat-header-cell [class]="['h_'+c.id]" *matHeaderCellDef mat-sort-header disableClear>{{c.header}}
+                <mat-header-cell [class]="['h',c.id]" *matHeaderCellDef mat-sort-header disableClear>{{c.header}}
                 </mat-header-cell>
             </ng-container>
             <ng-template #nosort>
-                <mat-header-cell [class]="['h_'+c.id]" *matHeaderCellDef>{{c.header}}</mat-header-cell>
+                <mat-header-cell [class]="['h',c.id]" *matHeaderCellDef>{{c.header}}</mat-header-cell>
             </ng-template>
-            <mat-cell *matCellDef="let element"> {{c.data(element)}} </mat-cell>
+            <mat-cell *matCellDef="let element" [class]="['d',c.id]"> {{c.data(element)}} </mat-cell>
         </ng-container>
 
         <ng-container [matColumnDef]="colData.image.id">
@@ -105,15 +98,9 @@
                 </div>
             </mat-cell>
         </ng-container>
-        <!-- <ng-container [matColumnDef]="colData.var.id">
-        <mat-header-cell class="h_var" *matHeaderCellDef></mat-header-cell>
-        <mat-cell *matCellDef="let element">
-            <mat-icon *ngIf="colData.var.exist(element)">edit</mat-icon>
-        </mat-cell>
-    </ng-container> -->
         <ng-container [matColumnDef]="colData.source.id">
-            <mat-header-cell class="h_source" *matHeaderCellDef mat-sort-header disableClear>入手手段</mat-header-cell>
-            <mat-cell class="d_source" *matCellDef="let element">
+            <mat-header-cell class="h source" *matHeaderCellDef mat-sort-header disableClear>入手手段</mat-header-cell>
+            <mat-cell class="d source" *matCellDef="let element">
                 <div>
                     <div class="list">
                         <div *ngFor="let s of element.source;let i = index">{{t.ItemsSource(s)}}
@@ -136,8 +123,8 @@
             </mat-cell>
         </ng-container>
         <ng-container [matColumnDef]="colData.variations.id">
-            <mat-header-cell class="h_variations" *matHeaderCellDef>バリエーション</mat-header-cell>
-            <mat-cell class="d_variations" *matCellDef="let element">
+            <mat-header-cell class="h variations" *matHeaderCellDef>バリエーション</mat-header-cell>
+            <mat-cell class="d variations" *matCellDef="let element">
                 <div>
                     <ng-container *ngIf="!element.variations;else vari">
                         <!-- <button mat-icon-button (click)="colData.check.checked(element)">
@@ -183,6 +170,7 @@
         </ng-container>
 
         <mat-header-row *matHeaderRowDef="col"></mat-header-row>
-        <mat-row #matrow *matRowDef="let row; columns: col;let i = index" (click)="clickRow(row)" [class.scrolled]="scrollIndex === i"></mat-row>
+        <mat-row #matrow *matRowDef="let row; columns: col;let i = index" (click)="clickRow(row)"
+            [class.scrolled]="scrollIndex === i" [class.checked]="colData.check.IsChecked(row)"></mat-row>
     </mat-table>
 </div>

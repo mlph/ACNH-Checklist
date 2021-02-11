@@ -32,17 +32,23 @@
     </button>
     <div>
         <mat-form-field>
-            <input matInput [(ngModel)]="search" (change)="Filter()">
-            <button mat-icon-button matSuffix (click)="search = '';Filter()">
+            <input matInput [(ngModel)]="searchText" (change)="Filter()">
+            <button mat-icon-button matSuffix (click)="searchText = '';Filter()">
                 <mat-icon>close</mat-icon>
             </button>
         </mat-form-field>
     </div>
     <button mat-button (click)="ToggleState(eventstate, event)">{{event.state}}</button>
+    <div class="space"></div>
+    <div>{{scrollText}}</div>
+    <button mat-icon-button (keyup)="scroller($event)" (focus)="focus()" (blur)="unfocus()"
+        [class.focused]="scrollerFocused">
+        <mat-icon>find_in_page</mat-icon>
+    </button>
 </mat-toolbar>
 <!-- </mat-toolbar> -->
 
-<div class="content">
+<div class="contents">
 
     <div>
         <button mat-icon-button (click)="CategoryAll(categories)">
@@ -54,12 +60,12 @@
 
 
 
-    <mat-table [dataSource]="showingData" matSort (matSortChange)="ReSort($event)" matSortActive="name"
+    <mat-table [dataSource]="showingData" matSort (matSortChange)="SortOrderChange($event)" matSortActive="name"
         matSortDirection="asc">
         <ng-container *ngFor="let c of colDataSimple" [matColumnDef]="c.id">
-            <mat-header-cell [class]="['h_'+c.id]" *matHeaderCellDef mat-sort-header disableClear>{{c.header}}
+            <mat-header-cell [class]="['h',c.id]" *matHeaderCellDef mat-sort-header disableClear>{{c.header}}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{c.data(element)}} </mat-cell>
+            <mat-cell *matCellDef="let element" [class]="['d',c.id]"> {{c.data(element)}} </mat-cell>
         </ng-container>
 
         <ng-container [matColumnDef]="colData.check.id">
@@ -81,8 +87,8 @@
             </mat-cell>
         </ng-container>
         <ng-container [matColumnDef]="colData.source.id">
-            <mat-header-cell class="h_source" *matHeaderCellDef mat-sort-header disableClear>入手手段</mat-header-cell>
-            <mat-cell class="d_source" *matCellDef="let element">
+            <mat-header-cell class="h source" *matHeaderCellDef mat-sort-header disableClear>入手手段</mat-header-cell>
+            <mat-cell class="d source" *matCellDef="let element">
                 <div>
                     <div>
                         <div *ngFor="let s of element.source;let i = index">{{t.ItemsSource(s)}}<ng-container
@@ -108,8 +114,8 @@
         </ng-container>
 
         <mat-header-row *matHeaderRowDef="col"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: col;" (click)="clickRow(row)"
-            [class.checked]="colData.check.IsChecked(row)"></mat-row>
+        <mat-row #matrow *matRowDef="let row; columns: col;let i = index" (click)="clickRow(row)"
+            [class.scrolled]="scrollIndex === i" [class.checked]="colData.check.IsChecked(row)"></mat-row>
     </mat-table>
 
 </div>

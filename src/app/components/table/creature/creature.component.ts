@@ -1,45 +1,38 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Sort } from '@angular/material/sort';
+import { MatRow } from '@angular/material/table';
 import { CreatureSourceSheet } from 'animal-crossing/lib/types/Creature';
 import { DataService, ICreatureJ } from 'src/app/services/data.service';
 import { NihongoService } from 'src/app/services/nihongo.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { TranslationService } from 'src/app/services/translation.service';
-import { SettingsComponent } from '../settings/settings.component';
+import { SettingsComponent } from '../../settings/settings.component';
+import { BaseComponent } from '../base.component';
 
 @Component({
   selector: 'app-creature',
   templateUrl: './creature.component.html',
   styleUrls: ['./creature.component.scss']
 })
-export class CreatureComponent implements OnInit {
+export class CreatureComponent extends BaseComponent<ICreatureJ> implements OnInit {
+
+  key = "creatures" as const;
 
   raw = this.data.creature;
 
-  filteredData: ICreatureJ[] = [];
-  showingData: ICreatureJ[] = [];
-
-  page = 1;
-  row = 100;
   checks = [
     { checked: true, icon: "check_box_outline_blank" },
     { checked: true, icon: "check_box" },
   ];
 
-  // filt = {
-  //   month: [],
-  //   time: []
-  // };
 
   month = -1;
   time = -1;
 
   highlightCurrentTime = true;
 
-
-  search = "";
-  col = ["name", "source", "catalog"];
+  lastSort: Sort = { active: "id", direction: "asc" };
 
   colDataSimple = [
     {
@@ -94,11 +87,9 @@ export class CreatureComponent implements OnInit {
       check: (i: ICreatureJ) => {
         // i.checked = !i.checked;
         this.settings.needToSave = true;
-        this.settings.checklist.creatures[i.internalId] = !this.settings.checklist.creatures[i.internalId];
+        this.settings.SetCreatureCheckToggle(i);
       },
-      IsChecked: (i: ICreatureJ) => {
-        return this.settings.checklist.creatures[i.internalId];
-      }
+      IsChecked: (i: ICreatureJ) => this.settings.IsCreatureCheck(i)
     },
     period: {
       id: "period",
@@ -148,43 +139,43 @@ export class CreatureComponent implements OnInit {
     CreatureSourceSheet.SeaCreatures,
   ].map(v => ({ key: v, name: this.t.CreatureSourceSheet(v), checked: false }));
 
+  @ViewChildren(MatRow, { read: ElementRef }) matrow?: QueryList<ElementRef>;
+
 
   constructor(
-    private data: DataService,
-    public settings: SettingsService,
-    public t: TranslationService,
-    private nihongo: NihongoService,
-    private dialog: MatDialog
-  ) { }
-
-  ngOnInit(): void {
-    this.Filter();
-    this.settings.headerChanged.subscribe(v => {
-      this.TableColumns();
-    });
-    this.TableColumns();
+    data: DataService,
+    settings: SettingsService,
+    t: TranslationService,
+    nihongo: NihongoService,
+    dialog: MatDialog
+  ) {
+    super(data, settings, t, nihongo, dialog);
   }
 
-  TableColumns() {
-    this.col = this.settings.headers("creatures").filter(i => i.enable).map(i => i.key);
-  }
-  OpenSettings() {
-    // this.settings.open(this.settings.headers("creatures"));
-    this.dialog.open(SettingsComponent, { data: { header: "creatures", subj: this.settings.headerChanged } });
-
-  }
 
 
   Filter() {
-    const compare = <T>(a?: number | string | T, b?: number | string | T) => {
-      if (b == null) { return -1; }
-      if (a == null) { return 1; }
-      if (typeof a === "string" && typeof b === "string") {
-        return this.nihongo.compareKana(a, b);
-      }
-      return (a < b ? -1 : 1);
-    };
+    // console.log(this._search);
 
+    this.filteredData = this._filter(this.raw)
+      // .filter(d => this.categories.find(c => c.key === d.sourceSheet)?.checked)
+      // .filter(d => this.settings.IsCreatureCheck(d) ? this.checks[1].checked : this.checks[0].checked)
+      // .filter(this.SearchWord)
+      .filter(d => {
+        if (this.month === -1) { return true; }
+        return this.data.hemisphere(d).monthsArray.includes(this.month);
+      })
+      .filter(d => {
+        if (this.time === -1) { return true; }
+        return this.data.hemisphere(d).timeArray.includes(this.time);
+      })
+      .sort(this.Sort());
+
+    this.PageChange();
+
+  }
+
+  Sort() {
     const compare_id = (a: ICreatureJ, b: ICreatureJ) => {
       const category = (c: ICreatureJ) => {
         switch (c.sourceSheet) {
@@ -199,94 +190,22 @@ export class CreatureComponent implements OnInit {
       }
       return a.num - b.num;
     };
-
-    // console.log(this._search);
-
-    this.filteredData = this.raw
-      .filter(d => this.categories.find(c => c.key === d.sourceSheet)?.checked)
-      .filter(d => {
-        switch (this.settings.checklist.creatures[d.internalId] || false) {
-          case false: return this.checks[0].checked;
-          case true: return this.checks[1].checked;
-        }
-      })
-      .filter(this.SearchWord)
-      .filter(d => {
-        if (this.month === -1) { return true; }
-        return this.data.hemisphere(d).monthsArray.includes(this.month);
-      })
-      .filter(d => {
-        if (this.time === -1) { return true; }
-        return this.data.hemisphere(d).timeArray.includes(this.time);
-      })
-      .sort((a, b) => {
-        const isAsc = this.lastSort.direction === 'asc' ? 1 : -1;
-        switch (this.lastSort.active) {
-          case 'name': return compare(a.nameJ, b.nameJ) * isAsc;
-          case 'id': return compare_id(a, b) * isAsc;
-          // case 'source': return compare_ItemSource(a.source, b.source, isAsc);
-          default: return 0;
-        }
-      });
-
-    if (this.filteredData.length <= (this.page - 1) * this.row) {
-      this.page = 1;
-    }
-    const s = (this.page - 1) * this.row;
-    this.showingData = this.filteredData
-      .slice(s, s + this.row);
-
-
+    return (a: ICreatureJ, b: ICreatureJ) => {
+      const isAsc = this.lastSort.direction === 'asc' ? 1 : -1;
+      switch (this.lastSort.active) {
+        case 'name': return this.sorthelper_compare(a.nameJ, b.nameJ) * isAsc;
+        case 'id': return compare_id(a, b) * isAsc;
+        // case 'source': return compare_ItemSource(a.source, b.source, isAsc);
+        default: return 0;
+      }
+    };
   }
 
-  private lastSort: Sort = { active: "id", direction: "asc" };
-  ReSort(sort: Sort) {
-    // console.log(sort);
-    this.lastSort = sort;
-    this.Filter();
+  FilterCheck(): ((i: ICreatureJ) => boolean) {
+    return d => this.settings.IsCreatureCheck(d) ? this.checks[1].checked : this.checks[0].checked;
   }
 
-  CategoryButton(c: { checked: boolean; }) {
-    c.checked = !c.checked;
-    this.Filter();
-  }
 
-  CategoryAll(c: { checked: boolean; }[]) {
-    if (c.find(i => i.checked)) {
-      c.forEach(i => i.checked = false);
-    } else {
-      c.forEach(i => i.checked = true);
-    }
-    this.Filter();
-  }
-
-  SearchWord = (d: ICreatureJ) => {
-    if (!this.search) {
-      return true;
-    }
-    return this.nihongo.match(d.nameJ, this.search);
-  };
-
-
-  IsNotLast(index: number, a?: Array<any>) {
-    if (a && a.length > index + 1) {
-      return true;
-    }
-    return false;
-  }
-
-  ToggleState<T>(states: (keyof T)[], current: { state: keyof T; }) {
-    // console.log(current);
-    const i = states.findIndex(s => s === current.state);
-    current.state = states[(i + 1) % states.length];
-    this.Filter();
-  }
-
-  clickRow(c: ICreatureJ) {
-    if (this.settings.generals.clickRowCheck) {
-      this.colData.check.check(c);
-    }
-  }
 
   IsNow_m(m: number) {
     return (new Date()).getMonth() + 1 === m;
@@ -295,4 +214,9 @@ export class CreatureComponent implements OnInit {
   IsNow_t(t: number) {
     return (new Date()).getHours() === t;
   }
+
+  check(i: ICreatureJ) {
+    this.colData.check.check(i);
+  }
+
 }

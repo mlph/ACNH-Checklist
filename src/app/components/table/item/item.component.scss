@@ -1,0 +1,18 @@
+@use "../base.scss";
+
+
+mat-table{
+    .d.variations>div{
+        width: 300px;
+        max-height: 150px;
+        overflow-y: auto;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 1em 0;
+    }
+
+    .catalog,.series{
+        max-width: 110px;
+    }
+
+}

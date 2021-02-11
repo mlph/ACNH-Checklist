@@ -34,6 +34,10 @@ mat-toolbar{
         font-size: small;
         color: gray;
     }
+
+    .focused{
+        background-color: white;
+    }
 }
 
 .contents{
@@ -50,14 +54,15 @@ mat-table{
     //         width: 3em;
     //     }
     // }
+    .checked{
+        background-color: rgb(83, 150, 172, 0.2);
+    }
     .scrolled{
         // background-color: red;
         animation: scrolled_background 2s infinite;
 
         @keyframes scrolled_background {
-            0% {background-color: transparent;}
             50% {background-color: pink;}
-            100% {background-color: transparent;}
         }
     }
     .image{
@@ -74,9 +79,12 @@ mat-table{
     img{
         max-height: 128px;
     }
+    .category{
+        max-width: 120px;
+    }
 
     .check{
-        max-width: 3em;
+        max-width: 66px;
     }
     // .h_image{
     //     max-width: 50vw;
@@ -84,16 +92,8 @@ mat-table{
     // .h_source,.h_variations{
     //     max-width: 20em;
     // }
-    .d_variations>div{
-        width: 300px;
-        max-height: 150px;
-        overflow-y: auto;
-        display: flex;
-        flex-wrap: wrap;
-        padding: 0.6em 0;
-    }
 
-    .d_source{
+    .d.source{
         >div{
             display: flex;
             align-items: center;

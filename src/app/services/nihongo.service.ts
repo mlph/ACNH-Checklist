@@ -31,7 +31,7 @@ export class NihongoService {
     // }
   }
 
-  toHiragana(s: string) {
+  toHiragana(s: string):string {
     return romaji(s).toHiragana();
   }
 

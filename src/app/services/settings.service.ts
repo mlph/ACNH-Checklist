@@ -8,9 +8,10 @@ import { Subject } from 'rxjs';
 import * as cjson from 'compressed-json';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { Category, Item } from 'animal-crossing/lib/types/Item';
-import { ItemJ } from './data.service';
+import { ICreatureJ, IRecipeJ, ItemJ } from './data.service';
 
 const LSkey = "acnh_checklist";
+const LSkeyS = "acnh_checklist_settings";
 
 const headersDefault = {
   items: [
@@ -19,11 +20,11 @@ const headersDefault = {
     { name: "名前", key: "name", enable: true, toggleSwitch: false },
     { name: "画像", key: "image", enable: false, toggleSwitch: true },
     { name: "入手手段", key: "source", enable: true, toggleSwitch: false },
-    { name: "カタログ", key: "catalog", enable: true, toggleSwitch: false },
+    { name: "カタログ", key: "catalog", enable: true, toggleSwitch: true },
     { name: "変種", key: "variants", enable: false, toggleSwitch: true },
     { name: "シリーズ", key: "series", enable: false, toggleSwitch: true },
     { name: "材料", key: "material", enable: false, toggleSwitch: true },
-    { name: "元データ", key: "rawdata", enable: false, toggleSwitch: true }
+    { name: "元データ", key: "rawdata", enable: false, toggleSwitch: false }
   ],
   recipes: [
     { name: "チェック", key: "check", enable: true, toggleSwitch: false },
@@ -34,7 +35,7 @@ const headersDefault = {
     { name: "イベント", key: "event", enable: true, toggleSwitch: false },
     { name: "カードの色", key: "color", enable: false, toggleSwitch: false },
     { name: "材料", key: "material", enable: false, toggleSwitch: true },
-    { name: "元データ", key: "rawdata", enable: false, toggleSwitch: true },
+    { name: "元データ", key: "rawdata", enable: false, toggleSwitch: false },
   ],
   creatures: [
     { name: "チェック", key: "check", enable: true, toggleSwitch: false },
@@ -46,9 +47,7 @@ const headersDefault = {
     { name: "かぐ", key: "imgFurniture", enable: false, toggleSwitch: false },
     { name: "特徴", key: "property", enable: false, toggleSwitch: true },
     { name: "生息時期", key: "period", enable: true, toggleSwitch: false },
-    // { name: "入手手段", key: "source", enable: true, toggleSwitch: false },
-    { name: "元データ", key: "rawdata", enable: false, toggleSwitch: true },
-    // { name: "イベント", key: "event", enable: true, toggleSwitch: false },
+    { name: "元データ", key: "rawdata", enable: false, toggleSwitch: false },
   ],
 };
 
@@ -99,6 +98,17 @@ export class SettingsService {
     creatures: { [internalId: number]: boolean; };
   } = { items: {}, recipes: {}, creatures: {} };
 
+  // checklist: {
+  //   items: Map<Category, Map<number, {
+  //     base: threeState;
+  //     variants: {
+  //       [variantId: string]: boolean;
+  //     };
+  //   }>>;
+  //   recipes: Map<number, boolean>;
+  //   creatures: Map<number, boolean>;
+  // } = { items: new Map(), recipes: new Map(), creatures: new Map() };
+
 
   headerChanged = new Subject<never>();
 
@@ -126,12 +136,47 @@ export class SettingsService {
   //   this.dialog.open(SettingsComponent, { data: { headers: header, subj: this.headerChanged } });
   // }
 
+
+
   stringify() {
+    // const items = this.checklist.items;
+    const _c: any = {};
+    ObjectForEach(this.checklist.items, (k, i) => {
+      const _i: Partial<{
+        [internalId: number]: {
+          base?: threeState;
+          variants?: {
+            [variantId: string]: boolean;
+          };
+        };
+      }> = {};
+      if (!i) { return; }
+      ObjectForEach(i, (id, ch) => {
+        const _ch: Partial<typeof ch> = {};
+        if (ch.variants && Object.keys(ch.variants).length > 0) {
+          _ch.variants = ch.variants;
+        }
+        if (_ch.variants || ch.base !== "false") {
+          _ch.base = ch.base;
+        }
+        if (_ch.variants || _ch.base) {
+          _i[id] = _ch;
+        }
+      });
+      if (Object.keys(_i).length > 0) {
+        _c[k] = _i;
+      }
+    });
+    // console.log(_c);
+
+    // console.log(this.checklist)
     return JSON.stringify(
       cjson.compress({
-        list: this.checklist,
-        headers: this._headers,
-        generals: this.generals
+        list: {
+          items: _c, recipes: this.checklist.recipes, creatures: this.checklist.creatures
+        },
+        // headers: this._headers,
+        // generals: this.generals
       })
     );
   }
@@ -148,6 +193,10 @@ export class SettingsService {
 
   save() {
     localStorage.setItem(LSkey, this.stringify());
+    localStorage.setItem(LSkeyS, JSON.stringify({
+      headers: this._headers,
+      generals: this.generals
+    }));
     this.needToSave = false;
     this.mayNeedToSave = false;
   }
@@ -156,12 +205,22 @@ export class SettingsService {
     if (data) {
       const p = this.parse(data);
       this.checklist = p.list || {};
-      this._headers = p.headers || {};
-      this.generals = p.generals || {};
+      // this._headers = p.headers || {};
+      // this.generals = p.generals || {};
     }
     this.checklist.items = this.checklist.items || {};
     this.checklist.recipes = this.checklist.recipes || {};
     this.checklist.creatures = this.checklist.creatures || {};
+
+  }
+
+  loadSettings(data: string) {
+    if (data) {
+      const p = JSON.parse(data);
+      this._headers = p.headers || {};
+      this.generals = p.generals || {};
+    }
+
 
     const def = (h: HeaderSetting) => ({
       enable: false,
@@ -185,14 +244,53 @@ export class SettingsService {
         this._headers.creatures?.push(def(h));
       }
     });
-
   }
+  // itemCheckList(i: ItemJ) {
+  //   if (!this.checklist.items[i.sourceSheet]) {
+  //     this.checklist.items[i.sourceSheet] = {};
+  //   }
+  //   return this.checklist.items[i.sourceSheet]!;
+  // }
 
-  itemCheckList(i: ItemJ) {
+  itemCheckList(i: ItemJ, initwithv = false) {
     if (!this.checklist.items[i.sourceSheet]) {
       this.checklist.items[i.sourceSheet] = {};
     }
-    return this.checklist.items[i.sourceSheet]!;
+    if (!this.checklist.items[i.sourceSheet]![i.internalId]) {
+      this.checklist.items[i.sourceSheet]![i.internalId] = {
+        base: "false",
+        variants: {}
+      };
+    }
+
+    return this.checklist.items[i.sourceSheet]![i.internalId]!;
+  }
+
+
+
+  SetRecipeCheck(r: IRecipeJ, v: boolean) {
+    this.checklist.recipes[r.internalId] = v;
+  }
+  SetRecipeCheckToggle(r: IRecipeJ) {
+    this.SetRecipeCheck(r, !this.IsRecipeCheck(r));
+  }
+  IsRecipeCheck(r: IRecipeJ): boolean {
+    return !!this.checklist.recipes[r.internalId];
+  }
+
+  SetCreatureCheck(c: ICreatureJ, v: boolean) {
+    this.checklist.creatures[c.internalId] = v;
+  }
+  SetCreatureCheckToggle(c: ICreatureJ) {
+    this.SetCreatureCheck(c, !this.IsCreatureCheck(c));
+  }
+  IsCreatureCheck(c: ICreatureJ): boolean {
+    return !!this.checklist.creatures[c.internalId];
+  }
+
+
+  recipeCheckList(r: IRecipeJ) {
+
   }
 
   moveItemInArray(header: "items" | "recipes" | "creatures", previousIndex: number, currentIndex: number) {
@@ -207,4 +305,12 @@ export type HeaderSetting = {
   enable: boolean;
   toggleSwitch: boolean;
 };
+
+// const ObjectMap = <T, U>(obj: T, callback: (t: T[keyof T]) => U) => {
+//   return (Object.keys(obj) as (keyof T)[]).map(k => callback(obj[k]));
+// };
+const ObjectForEach = <T>(obj: T, callback: (k: keyof T, t: T[keyof T]) => void) => {
+  (Object.keys(obj) as (keyof T)[]).map(k => callback(k, obj[k]));
+};
+
 

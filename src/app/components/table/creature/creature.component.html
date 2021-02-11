@@ -31,8 +31,8 @@
     </button>
     <div>
         <mat-form-field>
-            <input matInput [(ngModel)]="search" (change)="Filter()">
-            <button mat-icon-button matSuffix (click)="search = '';Filter()">
+            <input matInput [(ngModel)]="searchText" (change)="Filter()">
+            <button mat-icon-button matSuffix (click)="searchText = '';Filter()">
                 <mat-icon>close</mat-icon>
             </button>
         </mat-form-field>
@@ -62,18 +62,16 @@
     <div>
         <mat-checkbox [(ngModel)]="highlightCurrentTime">現在の月と時刻をハイライト</mat-checkbox>
     </div>
+    <div class="space"></div>
+    <div>{{scrollText}}</div>
+    <button mat-icon-button (keyup)="scroller($event)" (focus)="focus()" (blur)="unfocus()"
+        [class.focused]="scrollerFocused">
+        <mat-icon>find_in_page</mat-icon>
+    </button>
 </mat-toolbar>
-<!-- <mat-form-field>
-    <input matInput [(ngModel)]="page" type="number" (change)="Filter()">
-</mat-form-field>
-<mat-form-field>
-    <input matInput [(ngModel)]="row" type="number" (change)="Filter()">
-</mat-form-field>
-
-{{(page - 1) * row + 1}} - {{(page - 1) * row + showingData.length}} / {{filteredData.length}} / {{raw.length}} -->
 
 
-<div class="content">
+<div class="contents">
 
     <div class="categories">
         <button mat-icon-button (click)="CategoryAll(categories)">
@@ -84,7 +82,7 @@
     </div>
 
 
-    <mat-table [dataSource]="showingData" matSort (matSortChange)="ReSort($event)" matSortActive="id"
+    <mat-table [dataSource]="showingData" matSort (matSortChange)="SortOrderChange($event)" matSortActive="id"
         matSortDirection="asc">
         <ng-container *ngFor="let c of colDataSimple" [matColumnDef]="c.id">
             <ng-container *ngIf="c.sort;else nosort">
@@ -100,29 +98,12 @@
 
         <ng-container *ngFor="let c of colDataImage" [matColumnDef]="c.id">
             <mat-header-cell [class]="['h','image', c.id]" *matHeaderCellDef>{{c.header}}</mat-header-cell>
-            <mat-cell [class]="['c','image', c.id]" *matCellDef="let element"> <img [src]="element[c.key]"> </mat-cell>
+            <mat-cell [class]="['d','image', c.id]" *matCellDef="let element"> <img [src]="element[c.key]"> </mat-cell>
         </ng-container>
 
-        <!-- <ng-container [matColumnDef]="colData.image.id">
-        <mat-header-cell class="h_image" *matHeaderCellDef>がぞう</mat-header-cell>
-        <mat-cell *matCellDef="let element">
-            <div class="image">
-                <div *ngFor="let s of colData.image.data(element)">
-                    <div class="image-name">{{s.name}} </div>
-                    <img [src]="s.src" [id]="s.name">
-                </div>
-            </div>
-        </mat-cell>
-    </ng-container> -->
-        <!-- <ng-container [matColumnDef]="colData.var.id">
-        <mat-header-cell class="h_var" *matHeaderCellDef></mat-header-cell>
-        <mat-cell *matCellDef="let element">
-            <mat-icon *ngIf="colData.var.exist(element)">edit</mat-icon>
-        </mat-cell>
-    </ng-container> -->
         <ng-container matColumnDef="period">
             <mat-header-cell class="h period" *matHeaderCellDef>生息時期</mat-header-cell>
-            <mat-cell class="c period" *matCellDef="let element">
+            <mat-cell class="d period" *matCellDef="let element">
                 <div>
                     <div class="month">
                         <div *ngFor="let i of _12" [class.active]="colData.period.hem(element).monthsArray.includes(i)"
@@ -144,7 +125,7 @@
 
         <ng-container matColumnDef="property">
             <mat-header-cell class="h property" *matHeaderCellDef>特徴</mat-header-cell>
-            <mat-cell class="c property" *matCellDef="let element">
+            <mat-cell class="d property" *matCellDef="let element">
                 <ng-container *ngFor="let p of colData.property.data(element)">
                     <div class="key">{{p.key}}</div>
                     <div>{{p.value}}</div>
@@ -160,6 +141,7 @@
             </mat-cell>
         </ng-container>
         <mat-header-row *matHeaderRowDef="col"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: col;" (click)="clickRow(row)"></mat-row>
+        <mat-row #matrow *matRowDef="let row; columns: col;let i = index" (click)="clickRow(row)"
+            [class.scrolled]="scrollIndex === i" [class.checked]="colData.check.IsChecked(row)"></mat-row>
     </mat-table>
 </div>
