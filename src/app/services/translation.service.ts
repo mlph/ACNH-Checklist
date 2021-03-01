@@ -74,6 +74,7 @@ export class TranslationService {
       "Nook Shopping Seasonal": "たぬきショッピング 季節の商品",
       "Nook Shopping Daily Selection": "たぬきショッピング ひがわり",
       "Nook Shopping Posters": "たぬきショッピング ポスター",
+      "Nook Shopping Promotion": "たぬきショッピング キャンペーン",
       "Recycle box": "リサイクルボックス",
 
       "Jolly Redd's Treasure Trawler": "つねきちのいなりマーケット",
@@ -81,7 +82,6 @@ export class TranslationService {
       "Dodo Airlines": "ドードーエアライン",
       "Able Sisters": "エイブルシスターズ",
 
-      "Nook Shopping Promotion": "ポケットキャンプコラボ",
 
       "Assessing fossils": "かせきのかんてい",
       "Starting items": "はじめから持っている",

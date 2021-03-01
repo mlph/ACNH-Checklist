@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { items, recipes, IRecipe, creatures, ICreature, translations } from "animal-crossing";
-import { Category, Item, VariationElement, Version } from 'animal-crossing/lib/types/Item';
+import { Category, Gender, Item, VariationElement, Version } from 'animal-crossing/lib/types/Item';
 import { TranslationService } from './translation.service';
 
 import { NihongoService } from './nihongo.service';
@@ -151,7 +151,9 @@ export class DataService {
     // console.log(creatures.length, creatures[0]);
     // console.log(creatures.filter(c=>typeof c.hemispheres.north.timeArray[0] !== "number"))
     // console.log(items.filter(i=>i.versionAdded === Version.The170))
-    // console.log(items.filter(i=>i.genuine))
+    // console.log(items.filter(i=>i.nhStartDate)
+    // .map(i=>i.gender)
+    // )
   }
 
   hemisphere(c: Creature) {

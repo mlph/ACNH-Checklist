@@ -26,6 +26,8 @@ export class ItemComponent extends BaseComponent<ItemJ> implements OnInit, OnDes
   catalogForSale = false;
   diystate = ["全て", "DIYのみ", "DIY以外"];
   diy = { state: this.diystate[0] };
+  remakestate = ["全て", "リメイク可能", "リメイク不可"];
+  remake = { state: this.diystate[0] };
   checks = [
     { checked: true, icon: "check_box_outline_blank", key: "false" },
     { checked: true, icon: "check_box", key: "true" },
@@ -184,6 +186,9 @@ export class ItemComponent extends BaseComponent<ItemJ> implements OnInit, OnDes
 
   @ViewChildren(MatRow, { read: ElementRef }) matrow?: QueryList<ElementRef>;
 
+  filter_detail = [
+  ]
+
   constructor(
     data: DataService,
     settings: SettingsService,
@@ -202,6 +207,13 @@ export class ItemComponent extends BaseComponent<ItemJ> implements OnInit, OnDes
           switch (this.diy.state) {
             case (this.diystate[1]): return d.diy === true;
             case (this.diystate[2]): return d.diy === false;
+            default: return true;
+          }
+        })
+        .filter(d => {
+          switch (this.remake.state) {
+            case (this.remakestate[1]): return d.kitCost;
+            case (this.remakestate[2]): return !d.kitCost;
             default: return true;
           }
         })

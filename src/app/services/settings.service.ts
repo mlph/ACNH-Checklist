@@ -113,14 +113,15 @@ export class SettingsService {
   headerChanged = new Subject<never>();
 
   needToSave = false;
-  mayNeedToSave = false;
+  // mayNeedToSave = false;
 
   constructor(
     private dialog: MatDialog
   ) {
     this.load(localStorage.getItem(LSkey) || "");
 
-    this.headerChanged.subscribe(v => this.mayNeedToSave = true);
+    // this.headerChanged.subscribe(v => this.mayNeedToSave = true);
+    this.headerChanged.subscribe(v => this.save_settings());
   }
 
   headers(key: "items" | "recipes" | "creatures", filtered = false) {
@@ -191,14 +192,19 @@ export class SettingsService {
     };
   }
 
-  save() {
-    localStorage.setItem(LSkey, this.stringify());
+  save_settings(){
     localStorage.setItem(LSkeyS, JSON.stringify({
       headers: this._headers,
       generals: this.generals
     }));
+
+  }
+
+  save() {
+    localStorage.setItem(LSkey, this.stringify());
+    // this.save_settings();
     this.needToSave = false;
-    this.mayNeedToSave = false;
+    // this.mayNeedToSave = false;
   }
 
   load(data: string) {

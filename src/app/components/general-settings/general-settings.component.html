@@ -1,7 +1,7 @@
 <div class="checks">
-    <mat-checkbox [(ngModel)]="s.generals.materialImage" (click)="s.mayNeedToSave=true">材料の画像</mat-checkbox>
-    <mat-checkbox [(ngModel)]="s.generals.clickRowCheck" (click)="s.mayNeedToSave=true">行クリックでチェック</mat-checkbox>
-    <mat-checkbox [(ngModel)]="s.generals.hemisphere_north" (click)="s.mayNeedToSave=true">北半球</mat-checkbox>
+    <mat-checkbox [(ngModel)]="s.generals.materialImage" (click)="s.save_settings()">材料の画像</mat-checkbox>
+    <mat-checkbox [(ngModel)]="s.generals.clickRowCheck" (click)="s.save_settings()">行クリックでチェック</mat-checkbox>
+    <mat-checkbox [(ngModel)]="s.generals.hemisphere_north" (click)="s.save_settings()">北半球</mat-checkbox>
 </div>
 <button (click)="ex = !ex">エクスポート</button>
 <div class="IO" *ngIf="ex">

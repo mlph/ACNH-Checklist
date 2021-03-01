@@ -12,6 +12,7 @@ import { SettingsService } from 'src/app/services/settings.service';
 import { TranslationService } from 'src/app/services/translation.service';
 import { SettingsComponent } from '../settings/settings.component';
 
+
 @Component({
   template: ''
 })
@@ -44,6 +45,9 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
   scrollText = "";
   scrollTextReset = true;
   scrollerFocused = false;
+
+  filter_detail: { key: keyof T, value: any, valueType: "string" | "number" | "list" | "boolean" | "never", valueList?: any[], fuzzy?: boolean; }[] = [];
+  filter_detail_active: BaseComponent<T>["filter_detail"] = [];
 
   constructor(
     public data: DataService,
@@ -88,6 +92,17 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
           return this.categories.find(c => c.key === r.category)?.checked;
         }
         return this.categories.find(c => c.key === d.sourceSheet)?.checked;
+      })
+      .filter(d => {
+        if (this.filter_detail_active.length === 0) {
+          return true;
+        }
+        return this.filter_detail_active.every(f => {
+          if (f.fuzzy) {
+            return d[f.key] == f.value;
+          }
+          return d[f.key] === f.value;
+        });
       })
       .filter(this.FilterCheck())
       .filter(this.SearchWord);
@@ -168,7 +183,7 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
 
   check(i: T): void {
     throw new Error("Not Implemented");
-  }
+  };
 
   // @HostBinding("tabIndex") tabIndex!: string;
   // @HostListener("keyup", ["$event"]) onkeyUp(event: KeyboardEvent) {

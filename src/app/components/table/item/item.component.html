@@ -3,7 +3,7 @@
         <mat-icon>settings</mat-icon>
     </button>
     <mat-checkbox *ngFor="let s of settings.headers('items', true)" [(ngModel)]="s.enable"
-        (change)="TableColumns();settings.mayNeedToSave=true">
+        (change)="TableColumns();settings.save_settings()">
         {{s.name}}
     </mat-checkbox>
     <div class="space"></div>
@@ -40,6 +40,7 @@
     <app-checkbox-noop [checked]="catalogForSale" (click)="catalogForSale = !catalogForSale; Filter()">購入可のみ
     </app-checkbox-noop>
     <button mat-button (click)="ToggleState(diystate, diy)">{{diy.state}}</button>
+    <button mat-button (click)="ToggleState(remakestate, remake)">{{remake.state}}</button>
     <div class="space"></div>
     <div>{{scrollText}}</div>
     <button mat-icon-button (keyup)="scroller($event)" (focus)="focus()" (blur)="unfocus()"

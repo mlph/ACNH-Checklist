@@ -4,7 +4,7 @@
         <mat-icon>settings</mat-icon>
     </button>
     <mat-checkbox *ngFor="let s of settings.headers('recipes', true)" [(ngModel)]="s.enable"
-        (change)="TableColumns();settings.mayNeedToSave=true">
+        (change)="TableColumns();settings.save_settings()">
         {{s.name}}
     </mat-checkbox>
     <div class="space"></div>
