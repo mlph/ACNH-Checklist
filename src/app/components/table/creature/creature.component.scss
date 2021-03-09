@@ -1,74 +1,84 @@
 @use "../base.scss";
 
-mat-toolbar{
-    .month{
-        font-size: small;
-        line-height: normal;
-    }
+mat-toolbar {
+  .month {
+    font-size: small;
+    line-height: normal;
+  }
 }
 
-mat-table{
-    .check, .id{
-        max-width: 3em;
-    }
-    .period>div{
-        display: flex;
-    }
-    .month{
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-        color: lightgray;
+mat-table {
+  .check,
+  .id {
+    max-width: 40px;
+  }
+  .catchDifficulty,
+  .movementSpeed,
+  .shadow,
+  .spawnRates,
+  .vision,
+  .weather,
+  .whereHow {
+    max-width: 110px;
+  }
+  .period > div {
+    display: flex;
+  }
+  .month {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    color: lightgray;
 
-        $b: gray 1px solid;
+    $b: gray 1px solid;
 
-        border-top: $b;
-        border-left: $b;
-        >div{
-            border-bottom: $b;
-            border-right: $b;
-        }
-        .active{
-            background-color: yellowgreen;
-            color: black;
-        }
-        .current{
-            background-color: rgb(247, 194, 187);
-        }
-        .current.active{
-            background-color: rgb(202, 109, 86);
-        }
+    border-top: $b;
+    border-left: $b;
+    > div {
+      border-bottom: $b;
+      border-right: $b;
     }
-    .time{
-        display: grid;
-        grid-template-columns: repeat(24, 1fr);
-        color: lightgray;
-
-        $b: gray 1px solid;
-
-        border-left: $b;
-        >div{
-            width: 6px;
-            height: 6px;
-            content: "";
-            border-right: $b;
-        }
-        .active{
-            background-color: yellowgreen;
-            color: black;
-        }
-        .current{
-            background-color: rgb(247, 194, 187);
-        }
-        .current.active{
-            background-color: rgb(202, 109, 86);
-        }
+    .active {
+      background-color: yellowgreen;
+      color: black;
     }
-
-    .d.property{
-        display: grid;
-        grid-template-columns: auto 1fr;
-        .key{
-            margin-right: 1em;
-        }
+    .current {
+      background-color: rgb(247, 194, 187);
     }
+    .current.active {
+      background-color: rgb(202, 109, 86);
+    }
+  }
+  .time {
+    display: grid;
+    grid-template-columns: repeat(24, 1fr);
+    color: lightgray;
+
+    $b: gray 1px solid;
+
+    border-left: $b;
+    > div {
+      width: 6px;
+      height: 6px;
+      content: "";
+      border-right: $b;
+    }
+    .active {
+      background-color: yellowgreen;
+      color: black;
+    }
+    .current {
+      background-color: rgb(247, 194, 187);
+    }
+    .current.active {
+      background-color: rgb(202, 109, 86);
+    }
+  }
+
+  .d.property {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    .key {
+      margin-right: 1em;
+    }
+  }
 }

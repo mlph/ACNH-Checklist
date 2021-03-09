@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: column;
 }
-mat-toolbar{
+.toolbar{
     flex-shrink: 0;
     &.main{
         background-color: lightgreen;
@@ -19,13 +19,26 @@ mat-toolbar{
         }
     }
     display: flex;
+    align-items: center;
     .space{
         flex-grow: 1;
     }
+    .headers{
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .nowrap{
+        white-space: nowrap;
+    }
     .page,.row{
-        width: 4em;
-        margin-left: 1em;
+        width: 5em;
+        // margin-left: 1em;
         font-size: small;
+    }
+    .page-button{
+        width: 2em;
+        min-width: unset;
+        padding: 0;
     }
     .pages{
         font-size: small;

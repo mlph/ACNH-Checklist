@@ -12,18 +12,17 @@ import { SettingsService } from 'src/app/services/settings.service';
 import { TranslationService } from 'src/app/services/translation.service';
 import { SettingsComponent } from '../settings/settings.component';
 
-
 @Component({
-  template: ''
+  template: '',
 })
 export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
   raw: T[] = [];
 
   filteredData: T[] = [];
   showingData: T[] = [];
-  lastSort: Sort = { active: "name", direction: "asc" };
+  lastSort: Sort = { active: 'name', direction: 'asc' };
 
-  searchText = "";
+  searchText = '';
 
   page = 1;
   row = 100;
@@ -34,20 +33,34 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
     checked: boolean;
   }[] = [];
 
-  key?: "items" | "recipes" | "creatures";
+  key?: 'items' | 'recipes' | 'creatures';
   col: string[] = [];
+  colDataSimple: {
+    id: string;
+    header: string;
+    data: (i: T) => any;
+    sort?: boolean;
+    autoSortFunc?: boolean;
+    order?: any[];
+  }[] = [];
 
   scrollSubject = new Subject<string>();
   subsc!: Subscription;
   // @ViewChildren(MatRow, { read: ElementRef }) matrow?: QueryList<ElementRef>;
   matrow?: QueryList<ElementRef>;
   scrollIndex = -1;
-  scrollText = "";
+  scrollText = '';
   scrollTextReset = true;
   scrollerFocused = false;
 
-  filter_detail: { key: keyof T, value: any, valueType: "string" | "number" | "list" | "boolean" | "never", valueList?: any[], fuzzy?: boolean; }[] = [];
-  filter_detail_active: BaseComponent<T>["filter_detail"] = [];
+  filter_detail: {
+    key: keyof T;
+    value: any;
+    valueType: 'string' | 'number' | 'list' | 'boolean' | 'never';
+    valueList?: any[];
+    fuzzy?: boolean;
+  }[] = [];
+  filter_detail_active: BaseComponent<T>['filter_detail'] = [];
 
   constructor(
     public data: DataService,
@@ -55,11 +68,11 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
     public t: TranslationService,
     public nihongo: NihongoService,
     public dialog: MatDialog
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.Filter();
-    this.settings.headerChanged.subscribe(v => {
+    this.settings.headerChanged.subscribe((v) => {
       this.TableColumns();
     });
     this.TableColumns();
@@ -73,8 +86,10 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
 
   TableColumns() {
     if (this.key) {
-
-      this.col = this.settings.headers(this.key).filter(i => i.enable).map(i => i.key);
+      this.col = this.settings
+        .headers(this.key)
+        .filter((i) => i.enable)
+        .map((i) => i.key);
     }
   }
   OpenSettings() {
@@ -82,22 +97,20 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
     this.dialog.open(SettingsComponent, { data: { header: this.key, subj: this.settings.headerChanged } });
   }
 
-
-
   _filter(raw: T[]) {
     return raw
-      .filter(d => {
-        if (this.key === "recipes") {
+      .filter((d) => {
+        if (this.key === 'recipes') {
           const r = d as IRecipeJ;
-          return this.categories.find(c => c.key === r.category)?.checked;
+          return this.categories.find((c) => c.key === r.category)?.checked;
         }
-        return this.categories.find(c => c.key === d.sourceSheet)?.checked;
+        return this.categories.find((c) => c.key === d.sourceSheet)?.checked;
       })
-      .filter(d => {
+      .filter((d) => {
         if (this.filter_detail_active.length === 0) {
           return true;
         }
-        return this.filter_detail_active.every(f => {
+        return this.filter_detail_active.every((f) => {
           if (f.fuzzy) {
             return d[f.key] == f.value;
           }
@@ -109,11 +122,24 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
   }
 
   _sort(filterd: T[]) {
+    const c = this.colDataSimple.find((d) => d.id === this.lastSort.active);
+    // console.log(c);
+    const isAsc = this.lastSort.direction === 'asc' ? 1 : -1;
+    if (c && c.sort) {
+      if (c.autoSortFunc) {
+        return filterd.sort((a, b) => this.sorthelper_compare(c.data(a), c.data(b)) * isAsc);
+      }
+      if (c.order) {
+        return filterd.sort(
+          (a, b) => this.sorthelper_compare(c.order!.indexOf(c.data(a)), c.order!.indexOf(c.data(b))) * isAsc
+        );
+      }
+    }
     return filterd.sort(this.Sort());
   }
 
   Filter() {
-    throw new Error("Not Implemented");
+    throw new Error('Not Implemented');
   }
 
   PageChange() {
@@ -122,8 +148,7 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
       this.page = 1;
     }
     const s = (this.page - 1) * this.row;
-    this.showingData = this.filteredData
-      .slice(s, s + this.row);
+    this.showingData = this.filteredData.slice(s, s + this.row);
   }
 
   SortOrderChange(sort: Sort) {
@@ -132,16 +157,16 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
     this.Filter();
   }
 
-  CategoryButton(c: { checked: boolean; }) {
+  CategoryButton(c: { checked: boolean }) {
     c.checked = !c.checked;
     this.Filter();
   }
 
-  CategoryAll(c: { checked: boolean; }[]) {
-    if (c.find(i => i.checked)) {
-      c.forEach(i => i.checked = false);
+  CategoryAll(c: { checked: boolean }[]) {
+    if (c.find((i) => i.checked)) {
+      c.forEach((i) => (i.checked = false));
     } else {
-      c.forEach(i => i.checked = true);
+      c.forEach((i) => (i.checked = true));
     }
     this.Filter();
   }
@@ -153,58 +178,68 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
     return this.nihongo.match(d.nameJ, this.searchText);
   };
 
-  FilterCheck(): ((i: T) => boolean) {
-    throw new Error("Not Implemented");
+  FilterCheck(): (i: T) => boolean {
+    throw new Error('Not Implemented');
   }
 
   sorthelper_compare<T>(a?: number | string | T, b?: number | string | T) {
-    if (b == null) { return -1; }
-    if (a == null) { return 1; }
-    if (typeof a === "string" && typeof b === "string") {
+    if (b == null) {
+      return -1;
+    }
+    if (a == null) {
+      return 1;
+    }
+    if (typeof a === 'string' && typeof b === 'string') {
       return this.nihongo.compareKana(a, b);
     }
-    return (a < b ? -1 : 1);
-  };
+    return a < b ? -1 : 1;
+  }
 
   sorthelper_compare_ItemSource(a?: Array<string>, b?: Array<string>) {
-    if (b == null) { return -1; }
-    if (a == null) { return 1; }
+    if (b == null) {
+      return -1;
+    }
+    if (a == null) {
+      return 1;
+    }
     for (let i = 0; i < a.length && i < b.length; i++) {
       if (a[i] !== b[i]) {
         return this.sorthelper_compare(this.t.ItemsSource(a[i]), this.t.ItemsSource(b[i]));
       }
     }
     return a.length - b.length;
-  };
+  }
 
-  Sort(): ((a: T, b: T) => number) {
-    throw new Error("Not Implemented");
+  Sort(): (a: T, b: T) => number {
+    throw new Error('Not Implemented');
   }
 
   check(i: T): void {
-    throw new Error("Not Implemented");
-  };
+    throw new Error('Not Implemented');
+  }
 
   // @HostBinding("tabIndex") tabIndex!: string;
   // @HostListener("keyup", ["$event"]) onkeyUp(event: KeyboardEvent) {
   // }
 
   ScrollerInit() {
-    this.subsc = this.scrollSubject.pipe(
-      tap(s => {
-        if (this.scrollTextReset) {
-          this.scrollText = "";
-        }
-        this.scrollText = this.scrollText + s;
+    this.subsc = this.scrollSubject
+      .pipe(
+        tap((s) => {
+          if (this.scrollTextReset) {
+            this.scrollText = '';
+          }
+          this.scrollText = this.scrollText + s;
 
-        this.ScrollToTarget();
-        this.scrollTextReset = false;
-      }),
-      debounceTime(2000),
-      tap(() => this.scrollTextReset = true)
-    ).subscribe(() => {
-      // console.log(this.scrollText);
-    });
+          this.ScrollToTarget();
+          this.scrollTextReset = false;
+        }),
+        debounceTime(2000),
+        tap(() => (this.scrollTextReset = true))
+      )
+      .subscribe(() => {
+        // console.log(this.scrollText);
+      });
   }
 
   ScrollToTarget() {
@@ -214,16 +249,14 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
     // if (index >= 0) {
     //   this.ScrollToTargetIndex(index);
     // } else {
-    let index = this.filteredData.findIndex(i =>
+    let index = this.filteredData.findIndex((i) =>
       this.nihongo.toHiragana(i.nameJ).startsWith(this.nihongo.toHiragana(this.scrollText))
     );
     if (index === -1) {
-      index = this.filteredData.findIndex(i =>
-        i.nameJ.toUpperCase().startsWith(this.scrollText.toUpperCase())
-      );
+      index = this.filteredData.findIndex((i) => i.nameJ.toUpperCase().startsWith(this.scrollText.toUpperCase()));
     }
     if (index === -1) {
-      index = this.filteredData.findIndex(i => this.nihongo.match(i.nameJ, this.scrollText));
+      index = this.filteredData.findIndex((i) => this.nihongo.match(i.nameJ, this.scrollText));
     }
     if (index >= 0) {
       this.page = Math.ceil((index + 1) / this.row);
@@ -236,43 +269,41 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
   }
 
   scroller(event: KeyboardEvent) {
-
     (() => {
       if (event.key.length === 1) {
         return this.scrollSubject.next(event.key);
       }
       switch (event.key) {
-        case "Enter":
+        case 'Enter':
           if (this.showingData[this.scrollIndex]) {
             this.check(this.showingData[this.scrollIndex]);
           }
           return;
-        case "Delete" || "Backspace":
+        case 'Delete' || 'Backspace':
           this.scrollIndex = -1;
-          return this.scrollText = "";
-        case "PageUp":
+          return (this.scrollText = '');
+        case 'PageUp':
           return this.ScrollToTargetIndex(this.clamp(this.scrollIndex - 10, 0, this.showingData.length - 1));
-        case "PageDown":
+        case 'PageDown':
           return this.ScrollToTargetIndex(this.clamp(this.scrollIndex + 10, 0, this.showingData.length - 1));
-        case "Home":
+        case 'Home':
           return this.ScrollToTargetIndex(0);
-        case "End":
+        case 'End':
           return this.ScrollToTargetIndex(this.showingData.length - 1);
-        case "ArrowUp":
+        case 'ArrowUp':
           return this.ScrollToTargetIndex(this.clamp(this.scrollIndex - 1, 0, this.showingData.length - 1));
-        case "ArrowLeft":
+        case 'ArrowLeft':
           this.page = this.page - 1;
           return this.PageChange();
-        case "ArrowDown":
+        case 'ArrowDown':
           return this.ScrollToTargetIndex(this.clamp(this.scrollIndex + 1, 0, this.showingData.length - 1));
-        case "ArrowRight":
+        case 'ArrowRight':
           this.page = this.page + 1;
           return this.PageChange();
         default:
           console.log(event.key);
       }
     })();
-
   }
 
   ScrollToTargetIndex(index: number) {
@@ -281,7 +312,9 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
       if (this.matrow) {
         if (this.scrollIndex >= 0) {
           // console.log(this.matrow.toArray(), this.scrollIndex, this.scrollText)
-          this.matrow.toArray()[this.scrollIndex]?.nativeElement.scrollIntoView({ behavior: "smooth", block: "center" });
+          this.matrow
+            .toArray()
+            [this.scrollIndex]?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }
     });
@@ -293,7 +326,7 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
 
   unfocus() {
     this.scrollIndex = -1;
-    this.scrollText = "";
+    this.scrollText = '';
     this.scrollerFocused = false;
   }
 
@@ -304,9 +337,9 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
     return false;
   }
 
-  ToggleState<T>(states: (keyof T)[], current: { state: keyof T; }) {
+  ToggleState<T>(states: (keyof T)[], current: { state: keyof T }) {
     // console.log(current);
-    const i = states.findIndex(s => s === current.state);
+    const i = states.findIndex((s) => s === current.state);
     current.state = states[(i + 1) % states.length];
     this.Filter();
   }
@@ -325,6 +358,5 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
       return max;
     }
     return a;
-  };
-
+  }
 }

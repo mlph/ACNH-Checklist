@@ -1,31 +1,22 @@
 import { Injectable } from '@angular/core';
-import { items, recipes, IRecipe, creatures, ICreature, translations } from "animal-crossing";
-import { Category, Gender, Item, VariationElement, Version } from 'animal-crossing/lib/types/Item';
+import { items, recipes, IRecipe, creatures, ICreature, translations } from 'animal-crossing';
+import { Category, CeilingType, Gender, Item, Size, VariationElement, Version } from 'animal-crossing/lib/types/Item';
 import { TranslationService } from './translation.service';
 
 import { NihongoService } from './nihongo.service';
 import { SettingsService, threeState } from './settings.service';
-import { Creature } from 'animal-crossing/lib/types/Creature';
+import { Creature, CreatureSourceSheet } from 'animal-crossing/lib/types/Creature';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DataService {
-
-
-
-
   data!: ItemJ[];
-  categories: { key: Category, name: string; }[] = [];
+  categories: { key: Category; name: string }[] = [];
   recipe!: IRecipeJ[];
   creature!: ICreatureJ[];
 
-
-  constructor(
-    private t: TranslationService,
-    private nihongo: NihongoService,
-    private settings: SettingsService
-  ) {
+  constructor(private t: TranslationService, private nihongo: NihongoService, private settings: SettingsService) {
     this.Init();
     // this.Categories();
     this.test();
@@ -35,9 +26,9 @@ export class DataService {
     const Process_Item = (i: Item) => {
       const r = i as ItemJ;
       r.nameJ = i.translations?.japanese || i.name;
-      if(i.sourceSheet === Category.Art){
-        if(i.genuine === false){
-          r.nameJ = r.nameJ + "(にせもの)"
+      if (i.sourceSheet === Category.Art) {
+        if (i.genuine === false) {
+          r.nameJ = r.nameJ + '(にせもの)';
         }
       }
       if (!i.translations || !i.translations.japanese) {
@@ -50,10 +41,10 @@ export class DataService {
         //   console.log(t);
         // }
         const t: Record<string, string> = {
-          "turnips": "カブ",
-          "spoiled turnips": "くさったカブ",
-          "coin": "おカネ",
-          "Bell bag": "ベルぶくろ"
+          turnips: 'カブ',
+          'spoiled turnips': 'くさったカブ',
+          coin: 'おカネ',
+          'Bell bag': 'ベルぶくろ',
         };
         r.nameJ = t[r.name] || r.name;
       }
@@ -65,6 +56,7 @@ export class DataService {
         return r.translations?.id || -1;
       })();
       r.internalId = id;
+      r.surface ??= i.variations ? i.variations[0].surface : undefined;
       // r.checked = this.settings.checklist.items[id];
       // if (r.checked == null) {
       //   const c: { base: threeState, variants: { variantId: string; checked: boolean; }[]; } = {
@@ -77,7 +69,6 @@ export class DataService {
       // };
 
       // (r.variations || []).filter(v => !v.variantId && !v.variation).forEach(c => console.log(c));
-
       return r;
     };
     const Process_Recipe = (i: IRecipe) => {
@@ -95,9 +86,24 @@ export class DataService {
       return r;
     };
 
-    this.data = items.map(v => Process_Item(v));
-    this.recipe = recipes.map(Process_Recipe);
-    this.creature = creatures.map(Process_Creature);
+    this.data = items.map((v) => Process_Item(v))
+    .sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ))
+    ;
+    this.recipe = recipes.map(Process_Recipe).sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ));
+    const category = (c: ICreatureJ) => {
+      switch (c.sourceSheet) {
+        case CreatureSourceSheet.Insects:
+          return 0;
+        case CreatureSourceSheet.Fish:
+          return 1;
+        case CreatureSourceSheet.SeaCreatures:
+          return 2;
+      }
+    };
+    this.creature = creatures
+      .map(Process_Creature)
+      .sort((p, q) => p.num - q.num)
+      .sort((p, q) => category(p) - category(q));
   }
 
   test() {
@@ -126,9 +132,7 @@ export class DataService {
     // // console.log(a.filter(v => this.t.ItemsSource(v).startsWith("no")));
     // console.log(a);
     // const a = ["Furniture", "Accessories", "Tops Variants", "Furniture Patterns", "Furniture Variants", "Dresses Variants", "Dinosaurs", "Bottoms Variants", "Caps Variants", "Shoes Variants", "Constellations", "Craft", "Caps", "Socks", "Bugs", "Accessories Variants", "Bags Variants", "Socks Variants", "Tops", "Villagers", "Pictures", "Posters", "K.K. Albums", "Reactions", "Masks Variants", "ETC", "Rugs", "Marine Suit Variants", "Special NPCs", "Dresses", "Events", "HHA Themes", "Bags", "Fence", "Floors", "Walls", "Tools", "Doorplates", "Shoes", "Umbrella", "Masks", "Sea Creatures", "Villagers Catch Phrase", "Bottoms", "Bugs Models", "Fish", "Fish Models", "Marine Suit", "Event Items", "Fossils", "Art", "HHA Set", "Plants", "House Roof", "House Door", "HHA Situation", "House Wall", "House Mailbox", "Bridge & Inclines", "Fashion Themes", "Shells"]
-
     // a.forEach(s=>console.log(translations.find(t=>t.sourceSheet === s)))
-
     // const a:Item[][] = []
     // items
     // .forEach(i=>{
@@ -140,11 +144,8 @@ export class DataService {
     //     }
     //   }
     // })
-
     // console.log(a.filter(i=>i.length > 1).filter(i=>i[0].sourceSheet === i[1].sourceSheet))
-
     // console.log(items.filter(i=>!i.uniqueEntryId).filter(i=>i.villagerEquippable === undefined).filter)
-
     // console.log(seasonsAndEvents);
     // console.log(items.filter(i => !i.internalId && !i.translations?.id));
     // console.log(recipes.filter(i => !i.internalId ));
@@ -154,6 +155,14 @@ export class DataService {
     // console.log(items.filter(i=>i.nhStartDate)
     // .map(i=>i.gender)
     // )
+    // console.log(items.filter(i=>i.size === Size.The05X1))
+    // console.log(new Set(items.map(i=>i.)))
+    // console.log(new Set(items.map(i=>i.tag )))
+    // console.log(this.data.filter((i) => i.seasonEvent!= null));
+    // console.log(
+    //   items.filter((i) => i.variations).filter((i) => new Set(i.variations?.map((v) => v.surface)).size == 1)
+    // );
+
   }
 
   hemisphere(c: Creature) {
@@ -169,9 +178,9 @@ export class DataService {
    */
   RemoveNull<T>(src: T): Partial<T> {
     const result: Partial<T> = {};
-    for (let k of (Object.keys(src) as (keyof T)[])) {
-      if (src[k] == null) { }
-      else if (typeof src[k] === "object") {
+    for (let k of Object.keys(src) as (keyof T)[]) {
+      if (src[k] == null) {
+      } else if (typeof src[k] === 'object') {
         let a = src[k];
         result[k] = this.RemoveNull(src[k]) as any;
       } else {
@@ -182,11 +191,11 @@ export class DataService {
   }
 
   image(s: string) {
-    return items.find(i => i.name === s)?.inventoryImage || "";
+    return items.find((i) => i.name === s)?.inventoryImage || '';
   }
 
   series(s: string) {
-    return items.find(i => i.name === s)?.seriesTranslations?.japanese || "";
+    return items.find((i) => i.name === s)?.seriesTranslations?.japanese || '';
   }
 }
 
@@ -215,5 +224,4 @@ export type ICreatureJ = ICreature & {
   // catchPhraseJ: string;
 };
 
-
-export const variantId = (v: VariationElement) => v.variantId || v.variation?.toString() || "undefined";
+export const variantId = (v: VariationElement) => v.variantId || v.variation?.toString() || 'undefined';
