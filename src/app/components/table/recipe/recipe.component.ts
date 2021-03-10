@@ -38,11 +38,11 @@ export class RecipeComponent extends BaseComponent<IRecipeJ> implements OnInit {
     //   header: "カタログ",
     //   data: (i: ItemJ) => this.t.Catalog(i.catalog)
     // },
-    {
-      id: 'rawdata',
-      header: 'データ',
-      data: (i: any) => JSON.stringify(i, undefined, 2),
-    },
+    // {
+    //   id: 'rawdata',
+    //   header: 'データ',
+    //   data: (i: any) => JSON.stringify(i, undefined, 2),
+    // },
     {
       id: 'event',
       header: 'イベント',
@@ -106,6 +106,11 @@ export class RecipeComponent extends BaseComponent<IRecipeJ> implements OnInit {
           count: i.materials[m],
           image: this.data.image(m),
         })),
+    },
+    rawdata: {
+      id: 'rawdata',
+      header: 'データ',
+      data: (i: IRecipeJ) => JSON.stringify(i, undefined, 2),
     },
   };
 

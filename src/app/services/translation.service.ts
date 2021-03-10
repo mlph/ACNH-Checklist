@@ -459,7 +459,7 @@ export class TranslationService {
       case false:
         return 'いいえ';
       case undefined:
-        return 'いいえ';
+        return '';
       default:
         return no(w);
     }

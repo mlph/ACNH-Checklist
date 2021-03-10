@@ -118,7 +118,7 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
         });
       })
       .filter(this.FilterCheck())
-      .filter(this.SearchWord);
+      .filter(this.SearchWord());
   }
 
   _sort(filterd: T[]) {
@@ -171,12 +171,42 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
     this.Filter();
   }
 
-  SearchWord = (d: T) => {
+  SearchWord(): (data: T) => boolean {
     if (!this.searchText) {
-      return true;
+      return () => true;
     }
-    return this.nihongo.match(d.nameJ, this.searchText);
-  };
+
+    const reg = /(.*):(.*)/;
+    const hasProperty = <K extends string>(x: unknown, name: K): x is { [M in K]: unknown } => {
+      return x instanceof Object && name in x;
+    };
+
+    return (data: T) =>
+      this.searchText
+        .split(/\s/)
+        .map((w) => {
+          let invert = (b: boolean) => b;
+          if (w.startsWith('-')) {
+            w = w.substring(1);
+            invert = (b: boolean) => !b;
+            // return (_data: T) => !this.nihongo.includes(_data.nameJ, w.substring(1));
+          }
+
+          const r = reg.exec(w);
+          if (r) {
+            return (_data: T) => {
+              if (hasProperty(_data, r[1])) {
+                const prop = String(_data[r[1]]);
+                return invert(this.nihongo.includes(prop, r[2]));
+              }
+              return invert(false);
+            };
+          }
+
+          return (_data: T) => invert(this.nihongo.includes(_data.nameJ, w));
+        })
+        .every((f) => f(data));
+  }
 
   FilterCheck(): (i: T) => boolean {
     throw new Error('Not Implemented');

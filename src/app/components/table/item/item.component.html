@@ -19,14 +19,14 @@
   <div class="nowrap">
     <button class="page-button" mat-button (click)="page = page - 1; PageChange()">{{ "<" }}</button>
     <mat-form-field class="page">
-      <input matInput [(ngModel)]="page" type="number" min="1" (change)="PageChange()" />
+      <input matInput [(ngModel)]="page" type="number" min="1" (change)="PageChange()" id="page" />
       <span matSuffix class="suffix">page</span>
     </mat-form-field>
     <button class="page-button" mat-button (click)="page = page + 1; PageChange()">{{ ">" }}</button>
   </div>
   <div class="nowrap">
     <mat-form-field class="row">
-      <input matInput [(ngModel)]="row" type="number" min="1" (change)="PageChange()" />
+      <input matInput [(ngModel)]="row" type="number" min="1" (change)="PageChange()" id="row" />
     </mat-form-field>
     <span class="suffix">items per row</span>
   </div>
@@ -196,6 +196,12 @@
           <div>{{ s.count }}</div>
           <div><img *ngIf="settings.generals.materialImage" [src]="s.image" />{{ s.name }}</div>
         </div>
+      </mat-cell>
+    </ng-container>
+    <ng-container [matColumnDef]="colData.rawdata.id">
+      <mat-header-cell class="h rawdata" *matHeaderCellDef>{{ colData.rawdata.header }}</mat-header-cell>
+      <mat-cell class="d rawdata" *matCellDef="let element">
+        <textarea rows="4">{{ colData.rawdata.data(element) }}</textarea>
       </mat-cell>
     </ng-container>
 

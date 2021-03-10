@@ -1,146 +1,158 @@
-:host{
-    // height: 100%;
-    overflow-y: hidden;
-    display: flex;
-    flex-direction: column;
+:host {
+  // height: 100%;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
 }
-.toolbar{
-    flex-shrink: 0;
-    &.main{
-        background-color: lightgreen;
+.toolbar {
+  flex-shrink: 0;
+  &.main {
+    background-color: lightgreen;
+  }
+  &.sub {
+    background-color: lightskyblue;
+    .check {
+      color: lightblue;
+      &.active {
+        color: red;
+      }
     }
-    &.sub{
-        background-color: lightskyblue;
-        .check{
-            color: lightblue;
-            &.active{
-                color: red;
-            }
-        }
-    }
+  }
+  display: flex;
+  align-items: center;
+  .space {
+    flex-grow: 1;
+  }
+  .headers {
     display: flex;
-    align-items: center;
-    .space{
-        flex-grow: 1;
+    flex-wrap: wrap;
+  }
+  .nowrap {
+    white-space: nowrap;
+  }
+  .page,
+  .row {
+    width: 5em;
+    // margin-left: 1em;
+    font-size: small;
+  }
+  .page-button {
+    width: 2em;
+    min-width: unset;
+    padding: 0;
+  }
+  .pages {
+    font-size: small;
+  }
+  .suffix {
+    font-size: small;
+    color: gray;
+  }
+
+  .focused {
+    background-color: white;
+  }
+}
+
+.contents {
+  overflow-y: auto;
+  .active {
+    background-color: aqua;
+  }
+}
+
+mat-table {
+  // th{
+  //     // min-width: 5.5em;
+  //     &.h_var{
+  //         width: 3em;
+  //     }
+  // }
+  .checked {
+    background-color: rgb(83, 150, 172, 0.2);
+  }
+  .scrolled {
+    // background-color: red;
+    animation: scrolled_background 2s infinite;
+
+    @keyframes scrolled_background {
+      50% {
+        background-color: pink;
+      }
     }
-    .headers{
+  }
+  .image {
+    display: flex;
+    max-width: 400px;
+    overflow-x: auto;
+    white-space: nowrap;
+    .image-name {
+      // display: flex;
+      // flex-wrap: wrap;
+      font-size: small;
+    }
+  }
+  img {
+    max-height: 128px;
+  }
+  .category {
+    max-width: 120px;
+  }
+
+  .check {
+    max-width: 66px;
+  }
+  // .h_image{
+  //     max-width: 50vw;
+  // }
+  // .h_source,.h_variations{
+  //     max-width: 20em;
+  // }
+
+  .d.source {
+    > div {
+      display: flex;
+      align-items: center;
+      > div {
         display: flex;
         flex-wrap: wrap;
+      }
     }
-    .nowrap{
-        white-space: nowrap;
+    .list {
+      > div {
+        margin-right: 0.5em;
+      }
+      display: flex;
+      flex-wrap: wrap;
     }
-    .page,.row{
-        width: 5em;
-        // margin-left: 1em;
-        font-size: small;
+    .recipe {
+      font-size: small;
+      color: blue;
+      margin-right: 0.5em;
     }
-    .page-button{
-        width: 2em;
-        min-width: unset;
-        padding: 0;
-    }
-    .pages{
-        font-size: small;
-    }
-    .suffix{
-        font-size: small;
-        color: gray;
-    }
-
-    .focused{
-        background-color: white;
-    }
-}
-
-.contents{
-    overflow-y: auto;
-    .active{
-        background-color: aqua;
-    }
-}
-
-mat-table{
-    // th{
-    //     // min-width: 5.5em;
-    //     &.h_var{
-    //         width: 3em;
-    //     }
-    // }
-    .checked{
-        background-color: rgb(83, 150, 172, 0.2);
-    }
-    .scrolled{
-        // background-color: red;
-        animation: scrolled_background 2s infinite;
-
-        @keyframes scrolled_background {
-            50% {background-color: pink;}
-        }
-    }
-    .image{
+  }
+  .d.material {
+    display: grid;
+    grid-template-columns: 2em auto;
+    > div {
+      display: contents;
+      > div {
         display: flex;
-        max-width: 400px;
-        overflow-x: auto;
-        white-space: nowrap;
-        .image-name{
-            // display: flex;
-            // flex-wrap: wrap;
-            font-size: small;
-        }
+        align-items: center;
+      }
     }
-    img{
-        max-height: 128px;
+    img {
+      // height: 2em;
+      width: 2em;
     }
-    .category{
-        max-width: 120px;
-    }
+  }
 
-    .check{
-        max-width: 66px;
+  .rawdata {
+    textarea {
+      width: 100%;
     }
-    // .h_image{
-    //     max-width: 50vw;
-    // }
-    // .h_source,.h_variations{
-    //     max-width: 20em;
-    // }
-
-    .d.source{
-        >div{
-            display: flex;
-            align-items: center;
-            >div{
-                display: flex;
-                flex-wrap: wrap;
-            }
-        }
-        .list{
-            >div{
-                margin-right: 0.5em;
-            }
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .recipe{
-            font-size: small;
-            color: blue;
-            margin-right: 0.5em;
-        }
-    }
-    .d.material{
-        display: grid;
-        grid-template-columns: 2em auto;
-        >div{
-            display: contents;
-            >div{
-                display: flex;
-                align-items: center;
-            }
-        }
-        img{
-            // height: 2em;
-            width: 2em;
-        }
-    }
+  }
+  .version {
+    max-width: 120px;
+  }
 }

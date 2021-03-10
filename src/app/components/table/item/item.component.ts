@@ -59,12 +59,12 @@ export class ItemComponent extends BaseComponent<ItemJ> implements OnInit, OnDes
       sort: true,
       autoSortFunc: true,
     },
-    {
-      id: 'rawdata',
-      header: 'データ',
-      data: (i: ItemJ) => JSON.stringify(i, undefined, 2),
-      sort: false,
-    },
+    // {
+    //   id: 'rawdata',
+    //   header: 'データ',
+    //   data: (i: ItemJ) => JSON.stringify(i, undefined, 2),
+    //   sort: false,
+    // },
     {
       id: 'var',
       header: '',
@@ -200,6 +200,11 @@ export class ItemComponent extends BaseComponent<ItemJ> implements OnInit, OnDes
           count: i.recipe?.materials[m],
           image: this.data.image(m),
         })),
+    },
+    rawdata: {
+      id: 'rawdata',
+      header: 'データ',
+      data: (i: ItemJ) => JSON.stringify(i, undefined, 2),
     },
   };
 

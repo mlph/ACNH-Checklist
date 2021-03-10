@@ -53,12 +53,12 @@ export class CreatureComponent extends BaseComponent<ICreatureJ> implements OnIn
       key: 'num',
       sort: true,
     },
-    {
-      id: 'rawdata',
-      header: 'json',
-      data: (i: ICreatureJ) => JSON.stringify(i, undefined, 2),
-      sort: false,
-    },
+    // {
+    //   id: 'rawdata',
+    //   header: 'json',
+    //   data: (i: ICreatureJ) => JSON.stringify(i, undefined, 2),
+    //   sort: false,
+    // },
     {
       id: 'category',
       header: 'カテゴリ',
@@ -205,6 +205,11 @@ export class CreatureComponent extends BaseComponent<ICreatureJ> implements OnIn
       },
       // key:
       sort: false,
+    },
+    rawdata: {
+      id: 'rawdata',
+      header: 'データ',
+      data: (i: ICreatureJ) => JSON.stringify(i, undefined, 2),
     },
   };
 
