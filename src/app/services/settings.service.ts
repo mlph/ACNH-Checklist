@@ -75,7 +75,7 @@ export class SettingsService {
   } = {};
 
   generals = {
-    materialImage: true,
+    materialImage: false,
     // materialKanji: false,
     clickRowCheck: false,
     hemisphere_north: true,
@@ -310,6 +310,11 @@ export class SettingsService {
 
   DeleteSettings() {
     this.loadSettings('{}');
+    this.generals = {
+      materialImage: false,
+      clickRowCheck: false,
+      hemisphere_north: true,
+    };
   }
 }
 

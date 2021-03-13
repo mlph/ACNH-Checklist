@@ -31,6 +31,41 @@ export class CreatureComponent extends BaseComponent<ICreatureJ> implements OnIn
     { checked: true, icon: 'check_box' },
   ];
 
+  properties = [
+    'sourceSheet',
+    'num',
+    'name',
+    'iconImage',
+    'critterpediaImage',
+    'furnitureImage',
+    'sell',
+    'whereHow',
+    'weather',
+    'totalCatchesToUnlock',
+    'spawnRates',
+    'size',
+    'surface',
+    'description',
+    'catchPhrase',
+    'hhaBasePoints',
+    'hhaCategory',
+    'iconFilename',
+    'critterpediaFilename',
+    'furnitureFilename',
+    'internalId',
+    'uniqueEntryId',
+    'translations',
+    'hemispheres',
+    'colors',
+    'shadow',
+    'movementSpeed',
+    'lightingType',
+    'versionAdded',
+    'unlocked',
+    'catchDifficulty',
+    'vision',
+  ];
+
   month = -1;
   time = -1;
 

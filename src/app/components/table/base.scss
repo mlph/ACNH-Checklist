@@ -54,6 +54,16 @@
   }
 }
 
+.filter-button {
+  button {
+    // cursor: pointer;
+    padding: 1px 3px;
+    margin: 1px;
+    line-height: unset;
+    min-width: unset;
+  }
+}
+
 .contents {
   overflow-y: auto;
   .active {

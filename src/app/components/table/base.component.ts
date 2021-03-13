@@ -198,9 +198,9 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
               if (hasProperty(_data, r[1])) {
                 const prop = _data[r[1]];
                 if (Array.isArray(prop)) {
-                  return prop.some((a) => invert(this.nihongo.includes(String(a), r[2])));
+                  return prop.some((a) => invert(this.nihongo.includes(JSON.stringify(a), r[2])));
                 }
-                return invert(this.nihongo.includes(String(prop), r[2]));
+                return invert(this.nihongo.includes(JSON.stringify(prop), r[2]));
               }
               return invert(false);
             };
@@ -381,6 +381,10 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
     if (this.settings.generals.clickRowCheck) {
       this.check(c);
     }
+  }
+
+  addFilter(p: string) {
+    this.searchText += ` ${p}:`;
   }
 
   clamp(a: number, min: number, max: number) {

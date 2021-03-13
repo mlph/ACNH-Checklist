@@ -1,14 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  // items,
-  // recipes,
-  IRecipe,
-  // creatures,
-  ICreature,
-  // translations,
-  // seasonsAndEvents,
-  ISeasonsAndEvents,
-} from 'animal-crossing';
+import { IRecipe, ICreature, ISeasonsAndEvents } from 'animal-crossing';
 import { Category, CeilingType, Gender, Item, Size, VariationElement, Version } from 'animal-crossing/lib/types/Item';
 
 import { NihongoService } from './nihongo.service';
@@ -113,8 +104,7 @@ export class DataService {
     forkJoin([
       this.fetchData<Item[]>('items').pipe(
         map((items) => {
-          this.items = items.map((v) => Process_Item(v));
-          // .sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ))
+          this.items = items.map((v) => Process_Item(v)).sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ));
         })
       ),
       this.fetchData<IRecipe[]>('recipes').pipe(
@@ -217,13 +207,6 @@ export class DataService {
 
   fetchData<T>(key: keyof typeof url) {
     return this.http.get(url[key], { responseType: 'text' }).pipe(map((v) => JSON.parse(v) as T));
-    // this.http.get(url.items, { responseType: 'text' }).subscribe((v) => (this._items = JSON.parse(v)));
-    // this.http.get(url.recipes, { responseType: 'text' }).subscribe((v) => (this._recipe = JSON.parse(v)));
-    // this.http.get(url.creatures, { responseType: 'text' }).subscribe((v) => (this._creature = JSON.parse(v)));
-    // this.http.get(url.translations, { responseType: 'text' }).subscribe((v) => (this.translations = JSON.parse(v)));
-    // this.http
-    //   .get(url.seasonsAndEvents, { responseType: 'text' })
-    //   .subscribe((v) => (this.seasonsAndEvents = JSON.parse(v)));
   }
 
   hemisphere(c: Creature) {

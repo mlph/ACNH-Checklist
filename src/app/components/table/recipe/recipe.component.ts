@@ -27,6 +27,35 @@ export class RecipeComponent extends BaseComponent<IRecipeJ> implements OnInit {
     { checked: true, icon: 'check_box' },
   ];
 
+  properties = [
+    'sourceSheet',
+    'name',
+    'image',
+    'imageSh',
+    'buy',
+    'sell',
+    'exchangePrice',
+    'exchangeCurrency',
+    'source',
+    'sourceNotes',
+    'seasonEvent',
+    'seasonEventExclusive',
+    'versionAdded',
+    'unlocked',
+    'recipesToUnlock',
+    'category',
+    'craftedItemInternalId',
+    'cardColor',
+    'diyIconFilename',
+    'diyIconFilenameSh',
+    'serialId',
+    'internalId',
+    'uniqueEntryId',
+    'translations',
+    'materials',
+    'materialsTranslations',
+  ];
+
   colDataSimple = [
     {
       id: 'name',

@@ -21,3 +21,4 @@
   <ng-container *ngIf="tab === 'recipes'"><app-recipe></app-recipe></ng-container>
   <ng-container *ngIf="tab === 'creatures'"><app-creature></app-creature></ng-container>
 </ng-container>
+<ng-container *ngIf="!loaded">loading...</ng-container>
