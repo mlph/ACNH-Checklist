@@ -1,15 +1,23 @@
 <mat-toolbar>
-    <button mat-button routerLink="item" routerLinkActive="active">アイテム</button>
+  <!-- <button mat-button routerLink="item" routerLinkActive="active">アイテム</button>
     <button mat-button routerLink="recipe" routerLinkActive="active">レシピ</button>
-    <button mat-button routerLink="creature" routerLinkActive="active">いきもの</button>
-    <div class="space"></div>
-    <button mat-icon-button (click)="generalSettings()">
-        <mat-icon>settings</mat-icon>
-    </button>
-    <a href="https://github.com/Norviah/animal-crossing" target="_blank">
-        <button mat-button>元データ</button>
-    </a>
-    <button mat-button (click)="settings.save()" [class.need]="settings.needToSave">save</button>
+    <button mat-button routerLink="creature" routerLinkActive="active">いきもの</button> -->
+  <button mat-button (click)="tab = 'items'" [class.active]="tab === 'items'">アイテム</button>
+  <button mat-button (click)="tab = 'recipes'" [class.active]="tab === 'recipes'">レシピ</button>
+  <button mat-button (click)="tab = 'creatures'" [class.active]="tab === 'creatures'">いきもの</button>
+  <div class="space"></div>
+  <button mat-icon-button (click)="generalSettings()">
+    <mat-icon>settings</mat-icon>
+  </button>
+  <a href="https://github.com/Norviah/animal-crossing" target="_blank">
+    <button mat-button>元データ</button>
+  </a>
+  <button mat-button (click)="settings.save()" [class.need]="settings.needToSave">save</button>
 </mat-toolbar>
 
-<router-outlet></router-outlet>
+<ng-container *ngIf="loaded">
+  <!-- <router-outlet></router-outlet> -->
+  <ng-container *ngIf="tab === 'items'"><app-item></app-item></ng-container>
+  <ng-container *ngIf="tab === 'recipes'"><app-recipe></app-recipe></ng-container>
+  <ng-container *ngIf="tab === 'creatures'"><app-creature></app-creature></ng-container>
+</ng-container>

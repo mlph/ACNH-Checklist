@@ -5,13 +5,13 @@ import { ItemComponent } from './components/table/item/item.component';
 import { CreatureComponent } from './components/table/creature/creature.component';
 
 const routes: Routes = [
-  { path: "item", component: ItemComponent },
-  { path: "recipe", component: RecipeComponent },
-  { path: "creature", component: CreatureComponent },
+  // { path: "item", component: ItemComponent },
+  // { path: "recipe", component: RecipeComponent },
+  // { path: "creature", component: CreatureComponent },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

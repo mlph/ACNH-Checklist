@@ -21,12 +21,13 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { RecipeComponent } from './components/table/recipe/recipe.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { MatDialogModule } from "@angular/material/dialog";
-import { MatCardModule } from "@angular/material/card";
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
 import { CreatureComponent } from './components/table/creature/creature.component';
 import { GeneralSettingsComponent } from './components/general-settings/general-settings.component';
 import { CheckboxNoopComponent } from './components/parts/checkbox-noop/checkbox-noop.component';
 import { MatSelectModule } from '@angular/material/select';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { MatSelectModule } from '@angular/material/select';
     AppRoutingModule,
     BrowserAnimationsModule,
     FormsModule,
+    HttpClientModule,
 
     MatFormFieldModule,
     MatInputModule,
@@ -62,6 +64,6 @@ import { MatSelectModule } from '@angular/material/select';
     MatSelectModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

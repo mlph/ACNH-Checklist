@@ -30,7 +30,7 @@ import { BaseComponent } from '../base.component';
 export class ItemComponent extends BaseComponent<ItemJ> implements OnInit, OnDestroy {
   key = 'items' as const;
 
-  raw = this.data.data;
+  raw = this.data.items;
 
   catalogForSale = false;
   diystate = ['全て', 'DIYのみ', 'DIY以外'];

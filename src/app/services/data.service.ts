@@ -1,22 +1,46 @@
 import { Injectable } from '@angular/core';
-import { items, recipes, IRecipe, creatures, ICreature, translations } from 'animal-crossing';
+import {
+  // items,
+  // recipes,
+  IRecipe,
+  // creatures,
+  ICreature,
+  // translations,
+  // seasonsAndEvents,
+  ISeasonsAndEvents,
+} from 'animal-crossing';
 import { Category, CeilingType, Gender, Item, Size, VariationElement, Version } from 'animal-crossing/lib/types/Item';
-import { TranslationService } from './translation.service';
 
 import { NihongoService } from './nihongo.service';
-import { SettingsService, threeState } from './settings.service';
+import { SettingsService } from './settings.service';
 import { Creature, CreatureSourceSheet } from 'animal-crossing/lib/types/Creature';
+import { Translation } from 'animal-crossing/lib/types/Translation';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
+import { AsyncSubject, forkJoin } from 'rxjs';
+
+const url = {
+  items: 'https://raw.githubusercontent.com/Norviah/animal-crossing/master/json/combined/Items.json',
+  recipes: 'https://raw.githubusercontent.com/Norviah/animal-crossing/master/json/combined/Recipes.json',
+  creatures: 'https://raw.githubusercontent.com/Norviah/animal-crossing/master/json/combined/Creatures.json',
+  translations: 'https://raw.githubusercontent.com/Norviah/animal-crossing/master/json/combined/Translations.json',
+  seasonsAndEvents:
+    'https://raw.githubusercontent.com/Norviah/animal-crossing/master/json/combined/SeasonsAndEvents.json',
+};
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataService {
-  data!: ItemJ[];
-  categories: { key: Category; name: string }[] = [];
-  recipe!: IRecipeJ[];
-  creature!: ICreatureJ[];
+  items!: ItemJ[];
+  recipes!: IRecipeJ[];
+  creatures!: ICreatureJ[];
+  translations!: Translation[];
+  seasonsAndEvents!: ISeasonsAndEvents[];
 
-  constructor(private t: TranslationService, private nihongo: NihongoService, private settings: SettingsService) {
+  done = new AsyncSubject();
+
+  constructor(private nihongo: NihongoService, private settings: SettingsService, private http: HttpClient) {
     this.Init();
     // this.Categories();
     this.test();
@@ -86,24 +110,51 @@ export class DataService {
       return r;
     };
 
-    this.data = items.map((v) => Process_Item(v))
-    .sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ))
-    ;
-    this.recipe = recipes.map(Process_Recipe).sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ));
-    const category = (c: ICreatureJ) => {
-      switch (c.sourceSheet) {
-        case CreatureSourceSheet.Insects:
-          return 0;
-        case CreatureSourceSheet.Fish:
-          return 1;
-        case CreatureSourceSheet.SeaCreatures:
-          return 2;
-      }
-    };
-    this.creature = creatures
-      .map(Process_Creature)
-      .sort((p, q) => p.num - q.num)
-      .sort((p, q) => category(p) - category(q));
+    forkJoin([
+      this.fetchData<Item[]>('items').pipe(
+        map((items) => {
+          this.items = items.map((v) => Process_Item(v));
+          // .sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ))
+        })
+      ),
+      this.fetchData<IRecipe[]>('recipes').pipe(
+        map((recipes) => {
+          this.recipes = recipes.map(Process_Recipe).sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ));
+        })
+      ),
+      this.fetchData<ICreature[]>('creatures').pipe(
+        map((creatures) => {
+          const category = (c: ICreatureJ) => {
+            switch (c.sourceSheet) {
+              case CreatureSourceSheet.Insects:
+                return 0;
+              case CreatureSourceSheet.Fish:
+                return 1;
+              case CreatureSourceSheet.SeaCreatures:
+                return 2;
+            }
+          };
+
+          this.creatures = creatures
+            .map(Process_Creature)
+            .sort((p, q) => p.num - q.num)
+            .sort((p, q) => category(p) - category(q));
+        })
+      ),
+      this.fetchData<Translation[]>('translations').pipe(
+        map((translations) => {
+          this.translations = translations;
+        })
+      ),
+      this.fetchData<ISeasonsAndEvents[]>('seasonsAndEvents').pipe(
+        map((seasonsAndEvents) => {
+          this.seasonsAndEvents = seasonsAndEvents;
+        })
+      ),
+    ]).subscribe((v) => {
+      this.done.next(true);
+      this.done.complete();
+    });
   }
 
   test() {
@@ -162,7 +213,17 @@ export class DataService {
     // console.log(
     //   items.filter((i) => i.variations).filter((i) => new Set(i.variations?.map((v) => v.surface)).size == 1)
     // );
+  }
 
+  fetchData<T>(key: keyof typeof url) {
+    return this.http.get(url[key], { responseType: 'text' }).pipe(map((v) => JSON.parse(v) as T));
+    // this.http.get(url.items, { responseType: 'text' }).subscribe((v) => (this._items = JSON.parse(v)));
+    // this.http.get(url.recipes, { responseType: 'text' }).subscribe((v) => (this._recipe = JSON.parse(v)));
+    // this.http.get(url.creatures, { responseType: 'text' }).subscribe((v) => (this._creature = JSON.parse(v)));
+    // this.http.get(url.translations, { responseType: 'text' }).subscribe((v) => (this.translations = JSON.parse(v)));
+    // this.http
+    //   .get(url.seasonsAndEvents, { responseType: 'text' })
+    //   .subscribe((v) => (this.seasonsAndEvents = JSON.parse(v)));
   }
 
   hemisphere(c: Creature) {
@@ -191,11 +252,11 @@ export class DataService {
   }
 
   image(s: string) {
-    return items.find((i) => i.name === s)?.inventoryImage || '';
+    return this.items.find((i) => i.name === s)?.inventoryImage || '';
   }
 
   series(s: string) {
-    return items.find((i) => i.name === s)?.seriesTranslations?.japanese || '';
+    return this.items.find((i) => i.name === s)?.seriesTranslations?.japanese || '';
   }
 }
 

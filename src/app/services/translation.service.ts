@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { npcs, seasonsAndEvents, translations } from 'animal-crossing';
+// import { npcs, seasonsAndEvents, translations } from 'animal-crossing';
 import {
   CatchDifficulty,
   CreatureSourceSheet,
@@ -12,34 +12,50 @@ import {
 import { Catalog, Category, InteractEnum } from 'animal-crossing/lib/types/Item';
 import { Type } from 'animal-crossing/lib/types/SeasonsAndEvents';
 import { Personality } from 'animal-crossing/lib/types/Villager';
+import { DataService } from './data.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TranslationService {
-  constructor() {}
+  constructor(private data: DataService) {}
 
   all(s: string) {
-    return translations.find((v) => v.english === s)?.japanese || no(s);
+    return this.data.translations.find((v) => v.english === s)?.japanese || no(s);
   }
 
   ItemsSource(source?: string | null) {
     if (!source) {
       return no(source);
     }
-    const n = npcs.find((v) => v.name === source);
-    if (n) {
-      return n.translations.japanese;
-    }
+    // const n = npcs.find((v) => v.name === source);
+    // if (n) {
+    //   return n.translations.japanese;
+    // }
 
     const c: Record<string, string> = {
-      // Saharah: "ローラン", Gullivarrr: "かいぞく", "C.J.": "ジャスティン", Flick: "レックス",
-      // Label: "ことの", Gulliver: "ジョニー", Kicks: "シャンク", Leif: "レイジ",
-      // Pascal: "ラコスケ", "Daisy Mae": "ウリ",
-      // Cyrus: "カイゾー", Reese: "リサ", Franklin: "フランクリン", Jack: "パンプキング",
-      // Jingle: "ジングル", Zipper: "ぴょんたろう", Rover: "みしらぬネコ",
-      // "Tom Nook": "たぬきち", "K.K. concert": "とたけけ", Isabelle: "しずえ", Wilbur: "ロドリー", Blathers: "フータ",
-      //  Luna: "ゆめみ",
+      Saharah: 'ローラン',
+      Gullivarrr: 'かいぞく',
+      'C.J.': 'ジャスティン',
+      Flick: 'レックス',
+      Label: 'ことの',
+      Gulliver: 'ジョニー',
+      Kicks: 'シャンク',
+      Leif: 'レイジ',
+      Pascal: 'ラコスケ',
+      'Daisy Mae': 'ウリ',
+      Cyrus: 'カイゾー',
+      Reese: 'リサ',
+      Franklin: 'フランクリン',
+      Jack: 'パンプキング',
+      Jingle: 'ジングル',
+      Zipper: 'ぴょんたろう',
+      Rover: 'みしらぬネコ',
+      'Tom Nook': 'たぬきち',
+      Isabelle: 'しずえ',
+      Wilbur: 'ロドリー',
+      Blathers: 'フータ',
+      Luna: 'ゆめみ',
       Villagers: '島民',
       'All villagers': '島民',
       Snowboy: 'ゆきだるま',
@@ -160,7 +176,7 @@ export class TranslationService {
     }
 
     // "Cozy Turkey Day DIY", "Pretty Good Tools Recipes", "Wildest Dreams DIY", "DIY for Beginners", "Test Your DIY Skills",
-    const i = translations.find((t) => t.english === source);
+    const i = this.data.translations.find((t) => t.english === source);
     if (i) {
       return i.japanese;
     }
@@ -189,7 +205,7 @@ export class TranslationService {
         if (c[ss]) {
           return c[ss];
         }
-        const se = seasonsAndEvents.find((e) => e.name === ss);
+        const se = this.data.seasonsAndEvents.find((e) => e.name === ss);
         if (se) {
           if (se.type === Type.ZodiacSeason) {
             return se.translations?.japanese + 'ざ';

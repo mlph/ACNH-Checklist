@@ -24,7 +24,7 @@ import { BaseComponent } from '../base.component';
 export class CreatureComponent extends BaseComponent<ICreatureJ> implements OnInit {
   key = 'creatures' as const;
 
-  raw = this.data.creature;
+  raw = this.data.creatures;
 
   checks = [
     { checked: true, icon: 'check_box_outline_blank' },

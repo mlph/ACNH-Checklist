@@ -16,7 +16,7 @@ import { BaseComponent } from '../base.component';
   styleUrls: ['./recipe.component.scss'],
 })
 export class RecipeComponent extends BaseComponent<IRecipeJ> implements OnInit {
-  raw = this.data.recipe;
+  raw = this.data.recipes;
 
   key = 'recipes' as const;
 
