@@ -6,7 +6,8 @@
     "start": "ng serve --open --port 4301",
     "update": "npm i animal-crossing@latest",
     "deploy": "ng deploy --base-href=/ACNH-Checklist/",
-    "build": "ng build",
+    "build": "ng build --prod",
+    "8081": "npx http-server -p 8081 -c-1 dist/ACNH-Checklist",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -23,6 +24,7 @@
     "@angular/platform-browser": "~11.2.3",
     "@angular/platform-browser-dynamic": "~11.2.3",
     "@angular/router": "~11.2.3",
+    "@angular/service-worker": "~11.2.3",
     "@koozaki/romaji-conv": "^2.0.7",
     "compressed-json": "^1.0.16",
     "jaco": "^4.0.0",

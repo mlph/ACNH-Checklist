@@ -28,6 +28,8 @@ import { GeneralSettingsComponent } from './components/general-settings/general-
 import { CheckboxNoopComponent } from './components/parts/checkbox-noop/checkbox-noop.component';
 import { MatSelectModule } from '@angular/material/select';
 import { HttpClientModule } from '@angular/common/http';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -62,6 +64,7 @@ import { HttpClientModule } from '@angular/common/http';
     MatDialogModule,
     MatCardModule,
     MatSelectModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [],
   bootstrap: [AppComponent],
