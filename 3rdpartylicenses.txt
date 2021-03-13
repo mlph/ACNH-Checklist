@@ -66,6 +66,9 @@ MIT
 @angular/router
 MIT
 
+@angular/service-worker
+MIT
+
 @koozaki/romaji-conv
 MIT
 MIT License
