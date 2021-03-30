@@ -26,7 +26,14 @@
   </div>
   <div class="nowrap">
     <mat-form-field class="row">
-      <input matInput [(ngModel)]="row" type="number" min="1" (change)="PageChange()" id="row" />
+      <input
+        matInput
+        [(ngModel)]="settings.generals.perrow"
+        id="row"
+        type="number"
+        min="1"
+        (change)="PageChange(); settings.save_settings()"
+      />
     </mat-form-field>
     <span class="suffix">items per row</span>
   </div>
@@ -48,10 +55,13 @@
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
-    <button mat-icon-button [matMenuTriggerFor]="filter"><mat-icon>filter_alt</mat-icon></button>
+    <button mat-icon-button [matMenuTriggerFor]="filter" (click)="propertyFilter = ''; PropertyFilter()">
+      <mat-icon>filter_alt</mat-icon>
+    </button>
     <mat-menu #filter>
+      <!-- <input [(ngModel)]="propertyFilter" (input)="PropertyFilter()" /> -->
       <div class="filter-button">
-        <button mat-raised-button *ngFor="let p of properties" (click)="addFilter(p)">{{ p }}</button>
+        <button mat-raised-button *ngFor="let p of filteredProperties" (click)="addFilter(p)">{{ p }}</button>
       </div>
     </mat-menu>
   </div>

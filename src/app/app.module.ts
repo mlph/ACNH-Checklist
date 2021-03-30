@@ -30,6 +30,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { HttpClientModule } from '@angular/common/http';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
   declarations: [
@@ -64,6 +65,8 @@ import { environment } from '../environments/environment';
     MatDialogModule,
     MatCardModule,
     MatSelectModule,
+    MatAutocompleteModule,
+
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [],

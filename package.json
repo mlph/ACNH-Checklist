@@ -2,12 +2,12 @@
   "name": "acnh-checklist",
   "version": "0.0.0",
   "scripts": {
+    "8081": "npx http-server -p 8081 -c-1 dist/ACNH-Checklist",
     "ng": "ng",
     "start": "ng serve --open --port 4301",
     "update": "npm i animal-crossing@latest",
     "deploy": "ng deploy --base-href=/ACNH-Checklist/",
     "build": "ng build --prod",
-    "8081": "npx http-server -p 8081 -c-1 dist/ACNH-Checklist",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -39,7 +39,7 @@
     "@types/jasmine": "~3.6.0",
     "@types/node": "^12.19.15",
     "angular-cli-ghpages": "^1.0.0-rc.1",
-    "animal-crossing": "^7.3.0",
+    "animal-crossing": "^7.4.0",
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",

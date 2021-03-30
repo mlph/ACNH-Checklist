@@ -3,12 +3,12 @@ import { IRecipe, ICreature, ISeasonsAndEvents } from 'animal-crossing';
 import { Category, CeilingType, Gender, Item, Size, VariationElement, Version } from 'animal-crossing/lib/types/Item';
 
 import { NihongoService } from './nihongo.service';
-import { SettingsService } from './settings.service';
+import { SettingsService, LSKeyP } from './settings.service';
 import { Creature, CreatureSourceSheet } from 'animal-crossing/lib/types/Creature';
 import { Translation } from 'animal-crossing/lib/types/Translation';
 import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/operators';
-import { AsyncSubject, forkJoin } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+import { AsyncSubject, forkJoin, Subject } from 'rxjs';
 
 const url = {
   items: 'https://raw.githubusercontent.com/Norviah/animal-crossing/master/json/combined/Items.json',
@@ -31,10 +31,12 @@ export class DataService {
 
   done = new AsyncSubject();
 
+  loadingProgress = new Subject<string>();
+
   constructor(private nihongo: NihongoService, private settings: SettingsService, private http: HttpClient) {
     this.Init();
     // this.Categories();
-    this.test();
+    this.done.subscribe(() => this.test());
   }
 
   Init() {
@@ -101,16 +103,21 @@ export class DataService {
       return r;
     };
 
+    this.loadingProgress.next('loading initialize...');
+
     forkJoin([
       this.fetchData<Item[]>('items').pipe(
         map((items) => {
-          this.items = items.map((v) => Process_Item(v)).sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ));
-        })
+          this.items = this.ItemSorter(items.map((v) => Process_Item(v)));
+          // this.items = items.map((v) => Process_Item(v)).sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ));
+        }),
+        tap(() => this.loadingProgress.next('Items.json loaded'))
       ),
       this.fetchData<IRecipe[]>('recipes').pipe(
         map((recipes) => {
           this.recipes = recipes.map(Process_Recipe).sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ));
-        })
+        }),
+        tap(() => this.loadingProgress.next('Recipes.json loaded'))
       ),
       this.fetchData<ICreature[]>('creatures').pipe(
         map((creatures) => {
@@ -129,19 +136,24 @@ export class DataService {
             .map(Process_Creature)
             .sort((p, q) => p.num - q.num)
             .sort((p, q) => category(p) - category(q));
-        })
+        }),
+        tap(() => this.loadingProgress.next('Creatures.json loaded'))
       ),
       this.fetchData<Translation[]>('translations').pipe(
         map((translations) => {
           this.translations = translations;
-        })
+        }),
+        tap(() => this.loadingProgress.next('Translations.json loaded'))
       ),
       this.fetchData<ISeasonsAndEvents[]>('seasonsAndEvents').pipe(
         map((seasonsAndEvents) => {
           this.seasonsAndEvents = seasonsAndEvents;
-        })
+        }),
+        tap(() => this.loadingProgress.next('SeasonsAndEvents.json loaded'))
       ),
     ]).subscribe((v) => {
+      this.loadingProgress.next('done');
+      this.loadingProgress.complete();
       this.done.next(true);
       this.done.complete();
     });
@@ -203,6 +215,7 @@ export class DataService {
     // console.log(
     //   items.filter((i) => i.variations).filter((i) => new Set(i.variations?.map((v) => v.surface)).size == 1)
     // );
+    // console.log(new Set(this.items.map((i) => i.sourceSheet + i.internalId)).size, this.items.length);
   }
 
   fetchData<T>(key: keyof typeof url) {
@@ -241,6 +254,43 @@ export class DataService {
   series(s: string) {
     return this.items.find((i) => i.name === s)?.seriesTranslations?.japanese || '';
   }
+
+  ItemSorter(i: ItemJ[]): ItemJ[] {
+    // const t = Date.now();
+    const pre: PreSort = JSON.parse(localStorage.getItem(LSKeyP) || '{}');
+    const finder = (i: { sourceSheet: string; internalId: number; index: number }) => {
+      const s = pre.data.find((f) => f[0] === i.sourceSheet);
+      if (!s) return -1;
+      const ss = s[1]?.find((f) => f[0] === i.internalId);
+      if (!ss) return -1;
+      return ss[1];
+    };
+    try {
+      const presort = pre.data
+        ? i
+            .map((v, index) => ({ sourceSheet: v.sourceSheet, internalId: v.internalId, index: index }))
+            .sort((a, b) => finder(a) - finder(b))
+            .map((v) => i[v.index])
+        : i;
+      const postsort = presort.sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ));
+      if (!pre.data) {
+        const post: PreSort = {
+          version: '1.9.0',
+          data: [...new Set(postsort.map((i) => i.sourceSheet))].map((s) => [
+            s,
+            postsort.filter((i) => i.sourceSheet === s).map((i) => [i.internalId, postsort.indexOf(i)]),
+          ]),
+        };
+        localStorage.setItem(LSKeyP, JSON.stringify(post));
+      }
+      // console.log(Date.now() - t);
+      return postsort;
+    } catch {
+      console.error('presort failed');
+      localStorage.removeItem(LSKeyP);
+      return i.sort((p, q) => this.nihongo.compareKana(p.nameJ, q.nameJ));
+    }
+  }
 }
 
 export type ItemJ = Item & {
@@ -269,3 +319,8 @@ export type ICreatureJ = ICreature & {
 };
 
 export const variantId = (v: VariationElement) => v.variantId || v.variation?.toString() || 'undefined';
+
+type PreSort = {
+  version: string;
+  data: [sourchSheet: string, data: [internalId: number, sort: number][]][];
+};

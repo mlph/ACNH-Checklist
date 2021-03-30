@@ -12,11 +12,13 @@ import { GeneralSettingsComponent } from '../general-settings/general-settings.c
 export class MenuComponent implements OnInit {
   tab: 'items' | 'recipes' | 'creatures' | undefined;
   loaded = false;
+  messages: string[] = [];
 
   constructor(public settings: SettingsService, private dialog: MatDialog, private data: DataService) {}
 
   ngOnInit(): void {
     this.data.done.subscribe(() => (this.loaded = true));
+    this.data.loadingProgress.subscribe((v) => this.messages.push(v));
   }
 
   generalSettings() {

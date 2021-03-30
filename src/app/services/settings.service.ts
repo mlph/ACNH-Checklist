@@ -12,6 +12,7 @@ import { ICreatureJ, IRecipeJ, ItemJ } from './data.service';
 
 const LSkey = 'acnh_checklist';
 const LSkeyS = 'acnh_checklist_settings';
+export const LSKeyP = 'acnh_checklist_presort';
 
 const headersDefault = {
   items: [
@@ -79,6 +80,8 @@ export class SettingsService {
     // materialKanji: false,
     clickRowCheck: false,
     hemisphere_north: true,
+    perrow: 10,
+    presort: true,
   };
 
   // checklist: {
@@ -314,7 +317,12 @@ export class SettingsService {
       materialImage: false,
       clickRowCheck: false,
       hemisphere_north: true,
+      perrow: 10,
+      presort: true,
     };
+  }
+  DeleteSortData() {
+    localStorage.removeItem(LSKeyP);
   }
 }
 

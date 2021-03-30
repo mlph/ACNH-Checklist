@@ -15,8 +15,9 @@
   </div>
 </div>
 <div>
-    <button [matMenuTriggerFor]="delete">設定初期化</button>
-    <mat-menu #delete="matMenu">
-        <button (click)="s.DeleteSettings()">設定初期化</button>
-    </mat-menu>
+  <button [matMenuTriggerFor]="delete">設定初期化</button>
+  <mat-menu #delete="matMenu">
+    <button (click)="s.DeleteSettings()">設定初期化</button>
+    <button (click)="s.DeleteSortData()">ソートデータ初期化</button>
+  </mat-menu>
 </div>

@@ -22,3 +22,6 @@
   <ng-container *ngIf="tab === 'creatures'"><app-creature></app-creature></ng-container>
 </ng-container>
 <ng-container *ngIf="!loaded">loading...</ng-container>
+<!-- <ng-container *ngIf="!loaded || !tab">
+  <div *ngFor="let m of messages">{{ m }}</div>
+</ng-container> -->

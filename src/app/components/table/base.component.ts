@@ -25,7 +25,7 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
   searchText = '';
 
   page = 1;
-  row = 100;
+  row = this.settings.generals.perrow;
 
   categories: {
     key: ItemCategory | RecipeCategory | CreatureSourceSheet;
@@ -61,6 +61,10 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
     fuzzy?: boolean;
   }[] = [];
   filter_detail_active: BaseComponent<T>['filter_detail'] = [];
+
+  properties: string[] = [];
+  filteredProperties: string[] = [];
+  propertyFilter = '';
 
   constructor(
     public data: DataService,
@@ -395,5 +399,9 @@ export class BaseComponent<T extends ItemJ | IRecipeJ | ICreatureJ> {
       return max;
     }
     return a;
+  }
+
+  PropertyFilter() {
+    this.filteredProperties = this.properties.filter((v) => v.includes(this.propertyFilter));
   }
 }

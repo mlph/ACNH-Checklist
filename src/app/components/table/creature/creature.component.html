@@ -26,7 +26,14 @@
   </div>
   <div class="nowrap">
     <mat-form-field class="row">
-      <input matInput [(ngModel)]="row" id="row" type="number" min="1" (change)="PageChange()" />
+      <input
+        matInput
+        [(ngModel)]="settings.generals.perrow"
+        id="row"
+        type="number"
+        min="1"
+        (change)="PageChange(); settings.save_settings()"
+      />
     </mat-form-field>
     <span class="suffix">items per row</span>
   </div>

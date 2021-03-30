@@ -124,6 +124,7 @@ export class TranslationService {
       'Nook Shopping Posters': 'たぬきショッピング ポスター',
       'Nook Shopping Promotion': 'たぬきショッピング キャンペーン',
       'Recycle box': 'リサイクルボックス',
+      'Nook Link': 'タヌポータル',
 
       "Jolly Redd's Treasure Trawler": 'つねきちのいなりマーケット',
       "Redd's Raffle": 'つねきちのくじ',
@@ -460,7 +461,7 @@ export class TranslationService {
     }
   }
 
-  interact(w: boolean | InteractEnum | undefined) {
+  interact(w: boolean | InteractEnum | undefined | null) {
     switch (w) {
       case InteractEnum.Chair:
         return '椅子';
@@ -471,11 +472,13 @@ export class TranslationService {
       case InteractEnum.Trash:
         return 'ゴミ箱';
       case true:
-        return 'はい';
+        return '可';
       case false:
-        return 'いいえ';
+        return '不可';
       case undefined:
         return '';
+      case null:
+        return 'null';
       default:
         return no(w);
     }
